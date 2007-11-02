@@ -8,18 +8,16 @@
 
 import time
 import sys
+import os
 from optparse import OptionParser
 
-from raid_lib.raidweek_output import raidweek_output
 from raid_lib.datetime_range import datetime_range
 from raid_lib.get_roster import get_roster
 from raid_lib.parse_combat import parse_combat
 from raid_lib.parse_chat import parse_chat
+from raid_lib.write_summary import write_summary
 
 VERSION = '.002 (pre-alpha)'
-
-## Define the start of the raid week (1=Monday, 6=Sunday)
-raidweek_start = 2
 
 ## Options
 usage = "usage: %prog [options] -d DATE -n NAME"
@@ -40,6 +38,9 @@ parser.add_option('-v','--version', action="store_true", dest="version",
     default=False, help="show program version number and exit")
 
 (options, args) = parser.parse_args()
+
+## Define the start of the raid week (1=Monday, 6=Sunday)
+options.raidweek_start = 2
 
 if options.version:
     print "Version number is", VERSION
@@ -68,31 +69,10 @@ raids = parse_combat(parse_from, parse_to, options.combatlog, roster,
 loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
 
 ## Create the summary file
-datestr = parse_from.strftime('%Y-%m-%d')
-raidweekstr = raidweek_output(raidweek_start,parse_from
-##path = ('raids/%s' % raidweekstr)
-##if not isdir(path):
-##    print "error"
-##filename = ('%s/%s_%s.txt' % (path, datestr, options.name))
-filename = ('raids/%s_%s.txt' % (datestr, options.name))
-summary = open(filename,'w')
+write_summary(options, parse_from, raids, loots)
 
-for raid in raids:
-    line = 'Raided %s from %s until %s.\n' % (raid.zone, 
-        raid.start_time.strftime('%H:%M'),
-        raid.end_time.strftime('%H:%M'))
-    summary.write(line)
-    summary.write('Guild members in attendance:\n\n')
-    raid.raid_members.sort()
-    for member in raid.raid_members:
-        summary.write('    ' + member + '\n')    
-        
-summary.write('\n\nLoot received this day:\n\n')
-for loot in loots:
-    line = "    %s -- '%s' at %s.\n" % (loot[1], loot[2], 
-        loot[3].strftime('%H:%M'))
-    summary.write(line)            
-summary.close()
+## Update the raidweeks.xml
+update_raidweeks(options, parse_from)
 
 t2 = time.time()
 print "[complete] Process time was %f seconds." % (t2 - t1) 
