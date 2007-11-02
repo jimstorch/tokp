@@ -10,12 +10,16 @@ import time
 import sys
 from optparse import OptionParser
 
+from raid_lib.raidweek_output import raidweek_output
 from raid_lib.datetime_range import datetime_range
 from raid_lib.get_roster import get_roster
 from raid_lib.parse_combat import parse_combat
 from raid_lib.parse_chat import parse_chat
 
 VERSION = '.002 (pre-alpha)'
+
+## Define the start of the raid week (1=Monday, 6=Sunday)
+raidweek_start = 2
 
 ## Options
 usage = "usage: %prog [options] -d DATE -n NAME"
@@ -64,7 +68,12 @@ raids = parse_combat(parse_from, parse_to, options.combatlog, roster,
 loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
 
 ## Create the summary file
-datestr = parse_from.strftime('%Y-%m-%d') 
+datestr = parse_from.strftime('%Y-%m-%d')
+raidweekstr = raidweek_output(raidweek_start,parse_from
+##path = ('raids/%s' % raidweekstr)
+##if not isdir(path):
+##    print "error"
+##filename = ('%s/%s_%s.txt' % (path, datestr, options.name))
 filename = ('raids/%s_%s.txt' % (datestr, options.name))
 summary = open(filename,'w')
 

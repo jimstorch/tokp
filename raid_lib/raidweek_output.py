@@ -9,13 +9,12 @@
 
 # raidweek_start - day of the week on which the raid week starts and ends
 #                  (monday=1, tuesday=2 ...)
-# raid_date - date triplet
+# raid_date
 
 import datetime
 
 def raidweek_output(raidweek_start,raid_date):
     
-    raidweek = []
     raid_day = raid_date.isoweekday()
     week_start = datetime.date
     week_end = datetime.date
@@ -24,24 +23,16 @@ def raidweek_output(raidweek_start,raid_date):
     if raid_day <= raidweek_start:
         temp1 = datetime.timedelta(raidweek_start-raid_day-7)
         temp2 = datetime.timedelta(raidweek_start-raid_day)
-##        print "temp1:", temp1
-##        print "temp2:", temp2
         week_start = raid_date + temp1
         week_end = raid_date + temp2
     else:
         temp1 = datetime.timedelta(raidweek_start-raid_day)
         temp2 = datetime.timedelta(raidweek_start-raid_day+7)
-##        print "temp1:", temp1
-##        print "temp2:", temp2
         week_start = raid_date + temp1
         week_end = raid_date + temp2
 
-##    print week_start.isoformat()
-##    print week_end.isoformat()
-
     # form the string for the raidweek
-    str_raidweek = week_start.isoformat() + " " + week_end.isoformat()
-##    print str_raidweek
+    str_raidweek = week_start.strftime('%Y-%m-%d') + " " + week_end.strftime('%Y-%m-%d')
 
     return str_raidweek
     
