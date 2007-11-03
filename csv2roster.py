@@ -42,15 +42,19 @@ if options.version:
     sys.exit()
 
 if not os.path.exists(options.infile) or not os.path.isfile(options.infile):
-    print "[error] infile '%s' is not readible" % options.infile
+    print "[error] CSV file '%s' is not readible." % options.infile
     sys.exit()
 
 if not options.overwrite and os.path.exists(options.outfile):
-    print "[error] '%s' already exist.  Use '-y' to overwrite." % options.outfile
+    print "[error] '%s' already exist.  Use '-y' to overwrite." \
+         % options.outfile
     sys.exit()    
 
+# read in the contents of the CSV file
 roster = get_roster_csv(options.infile)
-#write_roster_test(roster)
+
+# write out a plain text file with one name per line
+write_roster_text(roster,options.outfile)
  
     
 

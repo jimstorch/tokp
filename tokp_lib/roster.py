@@ -12,17 +12,14 @@ import csv
 #--[ Get Roster ]--------------------------------------------------------------
 
 def get_roster(roster_file):
-
     roster = []
-   
     text_file = open(roster_file,'rU')
-    for guildie in text_file:
+    for line in text_file:
         guildie = line.strip()
         if not guildie in roster:        
             roster.append(guildie)
         else:
             print '[warning] Duplicate guildmember name:', guildie
-
     print "[get_roster] Found", len(roster), "guildmembers."
     # print roster
     return roster
@@ -64,7 +61,14 @@ def get_roster_csv(csv_file):
 
 #--[ Write Roster Text ]-------------------------------------------------------
 
-def write_roster_text(roster, roster_text_file):
-        pass
+def write_roster_text(roster, text_file):
+    roster.sort()
+    print "[writie_roster_text] Writing new roster to", text_file
+    out = open(text_file,'w')
+    for guildie in roster:
+        out.write(guildie + '\n')
+    out.close()
+    
+    
 
 
