@@ -13,7 +13,7 @@ import os
 from optparse import OptionParser
 
 from tokp_lib.datetime_range import datetime_range
-from tokp_lib.roster import get_roster
+#from tokp_lib.roster import get_roster
 from tokp_lib.parse_combat import parse_combat
 from tokp_lib.parse_chat import parse_chat
 from tokp_lib.write_summary import write_summary

@@ -8,6 +8,9 @@
 
 import csv
 
+
+#--[ Get Roster ]--------------------------------------------------------------
+
 def get_roster(roster_file):
 
     roster = []
@@ -15,7 +18,7 @@ def get_roster(roster_file):
     text_file = open(roster_file,'rU')
     for guildie in text_file:
         guildie = line.strip()
-        if not guildie in roster        
+        if not guildie in roster:        
             roster.append(guildie)
         else:
             print '[warning] Duplicate guildmember name:', guildie
@@ -44,9 +47,9 @@ def get_roster(roster_file):
 # 3        Level
 # 4        Class
 
-def get_roster_csv(roster_csv_file):
+def get_roster_csv(csv_file):
     roster = []
-    reader = csv.reader(open(roster_file,'rU'))
+    reader = csv.reader(open(csv_file,'rU'))
     # skip the header row
     foo = reader.next()
     for row in reader:
