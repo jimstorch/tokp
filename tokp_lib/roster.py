@@ -49,6 +49,7 @@ def get_roster(roster_file):
 
 def get_roster_csv(csv_file):
     roster = []
+    print "[get_roster_csv] reading file '%s'" % csv_file
     reader = csv.reader(open(csv_file,'rU'))
     # skip the header row
     foo = reader.next()
@@ -56,7 +57,7 @@ def get_roster_csv(csv_file):
         ## only retrieve the level 70's (or greater; cheap futureproof)
         if int(row[3]) >= 70: 
             roster.append(row[0])
-    print "[roster] Found", len(roster), "level 70 guildmembers."
+    print "[get_roster_csv] Found", len(roster), "level 70 guildmembers."
     #print roster       
     return roster
 
