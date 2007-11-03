@@ -8,8 +8,8 @@
 import datetime
 import re
 
-from raid_lib.timestamp_event import timestamp_event
-from raid_lib.zones import get_loot_dict
+from tokp_lib.timestamp_event import timestamp_event
+from tokp_lib.zones import get_loot_dict
 
 # regex to pull name & item
 loot_str = r"^(?P<name>.+)\sreceive[s]?\sloot:\s(?P<item>.+)\."

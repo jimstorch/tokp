@@ -19,7 +19,7 @@ import csv
 #              '1 - Guild Leader'
 #              '2 - Officer'
 #              '3 - Banker'
-#              '4 - Member'
+#              '4 - Member'll
 #              '5 - Initiate'
 #              '6 - Alt Char'
 #              '7 - Guest'

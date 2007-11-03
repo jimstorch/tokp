@@ -7,8 +7,8 @@
 
 import datetime
 import re
-from raid_lib.timestamp_event import timestamp_event
-from raid_lib.zones import get_mob_dict
+from tokp_lib.timestamp_event import timestamp_event
+from tokp_lib.zones import get_mob_dict
 
 #--[ Regular Expressions to extract names from battle spam ]-------------------
 

@@ -12,11 +12,11 @@ import sys
 import os
 from optparse import OptionParser
 
-from raid_lib.datetime_range import datetime_range
-from raid_lib.get_roster import get_roster
-from raid_lib.parse_combat import parse_combat
-from raid_lib.parse_chat import parse_chat
-from raid_lib.write_summary import write_summary
+from tokp_lib.datetime_range import datetime_range
+from tokp_lib.get_roster import get_roster
+from tokp_lib.parse_combat import parse_combat
+from tokp_lib.parse_chat import parse_chat
+from tokp_lib.write_summary import write_summary
 
 VERSION = '.002 (pre-alpha)'
 
