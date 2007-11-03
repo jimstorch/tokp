@@ -3,7 +3,8 @@
 #   File:       raid_parser.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPL V2    
 #------------------------------------------------------------------------------
 
 import time

@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #   File:       zones.py
-#   Purpose:    
+#   Purpose:    loads raid zone related lookups from text files
 #   Author:     Jim Storch
 #   Revised:    
 #------------------------------------------------------------------------------
