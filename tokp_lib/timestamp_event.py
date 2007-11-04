@@ -2,7 +2,8 @@
 #   File:       timestamp_event.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 # Given a line from the log file, returns a tuple consisting on the timestamp

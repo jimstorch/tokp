@@ -3,6 +3,7 @@
 #   Purpose:    
 #   Author:     
 #   Revised:    
+#   License:    GPLv3 see LICENSE.TXT
 #------------------------------------------------------------------------------
 
 import os

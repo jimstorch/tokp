@@ -2,7 +2,8 @@
 #   File:       output_gen.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 def output_folder(timestamp):

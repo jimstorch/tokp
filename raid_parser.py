@@ -4,7 +4,7 @@
 #   Purpose:    
 #   Author:     Jim Storch
 #   Revised:
-#   License:    GPL V2    
+#   License:    GPLv3 see LICENSE.TXT   
 #------------------------------------------------------------------------------
 
 import time

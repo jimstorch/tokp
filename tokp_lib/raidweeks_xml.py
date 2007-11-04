@@ -2,7 +2,8 @@
 #   File:       raidweeks_xml.py
 #   Purpose:    
 #   Author:     James Mynderse
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 import datetime

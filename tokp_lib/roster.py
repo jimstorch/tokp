@@ -3,7 +3,7 @@
 #   Purpose:    
 #   Author:     Jim Storch
 #   Revised:
-#   License:    GPL v2    
+#   License:    GPLv3 see LICENSE.TXT 
 #------------------------------------------------------------------------------
 
 import csv

@@ -2,7 +2,8 @@
 #   File:       zones.py
 #   Purpose:    loads raid zone related lookups from text files
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 import glob

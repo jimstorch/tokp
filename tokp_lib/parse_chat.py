@@ -2,7 +2,8 @@
 #   File:       parse_chat.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 import datetime

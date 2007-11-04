@@ -2,7 +2,8 @@
 #   File:       datetime_range.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:    
+#   Revised:
+#   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 # Given a month/day string in the format MM/DD returns two datetime objects
