@@ -7,28 +7,61 @@
 
 import datetime
 import os
-import xml.parsers.expat
+import xml.dom.minidom
 
-xml_file = "raids\raidweeks.xml"
+xml_file = "c:\\james\\svn\\tokp\\raids\\raidweeks.xml"
 
 ## Create an empty raidweeks.xml file
-def create_raidweeks()
+def create_raidweeks():
+
+    empty_raidweeks = """\
+    <weeks>
+    </weeks>
+    """
+    
+    raidweeks_dom = xml.dom.minidom.parseString(empty_raidweeks)
 
 
+    
+    return 1
 
+## Get the text out of a nodelist
+def getText(nodelist):
+    rc = ""
+    for node in nodelist:
+        if node.nodeType == node.TEXT_NODE:
+            rc = rc + node.data
+    rc = str(rc)
+    return rc
 
 ## Load the raidweeks.xml file into the raidweeks variable
 def load_raidweeks():
 
+    vec_raidweeks = []
+
     if not os.path.isfile(xml_file):
-        print "Error!"
+        create_raidweeks()
 
-    raidweeks = "temp"
+    raidweeks_dom = xml.dom.minidom.parse(xml_file)
 
-    return raidweeks
+    # does it have the base element "weeks"?
+    # if not, make a new xml and try again
+    if not raidweeks_dom.getElementsByTagName("weeks"):
+        create_raidweeks()
+        raidweeks_dom = xml.dom.minidom.parse(xml_file)
+
+    # pull out all "week" elements and add them to the raidweeks list
+    raidweeks = raidweeks_dom.getElementsByTagName("week")
+    for raidweek in raidweeks:
+        raidweek_dir = raidweek.getElementsByTagName("dir")[0]
+        raidweek_dir_str = getText(raidweek_dir.childNodes)
+        # print "%s" % raidweek_dir_str
+        vec_raidweeks.append(raidweek_dir_str)
+
+    return vec_raidweeks
 
 
-## Save the raidweeks variable to raidweeks.xml
+## Write the raidweeks list to raidweeks.xml
 def save_raidweeks():
 
     # finished successfully
