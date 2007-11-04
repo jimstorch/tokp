@@ -12,6 +12,7 @@ import sys
 import os
 from optparse import OptionParser
 
+from tokp_lib.raidweeks_xml import update_raidweeks
 from tokp_lib.datetime_range import datetime_range
 from tokp_lib.roster import get_roster
 from tokp_lib.parse_combat import parse_combat

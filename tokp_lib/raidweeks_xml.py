@@ -64,12 +64,22 @@ def load_raidweeks():
 ## Write the raidweeks list to raidweeks.xml
 def save_raidweeks():
 
+    # load the raidweeks
+    vec_raidweeks = load_raidweeks()
+
+    # form current raidweek
+    str_raidweek = raidweek_output()
+
     # finished successfully
     return 1
 
+## Update the raidweeks to include the week corresponding to the current raid
+def update_raidweeks(options, raid_date):
+
+    return 1
 
 ## Define a string for the raid week corresponding to the selected date
-def raidweek_output(raidweek_start,raid_date):
+def raidweek_output(raidweek_start, raid_date):
     
     raid_day = raid_date.isoweekday()
     week_start = datetime.date
