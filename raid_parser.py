@@ -33,7 +33,7 @@ parser.add_option('-b','--battlelog', dest='combatlog',
 parser.add_option('-c','--chatlog', dest='chatlog', 
     default='logs/WoWChatLog.txt', help="filename of the chat log to parse")
 parser.add_option('-r','--roster', dest='roster', 
-    default='roster/ToK Roster.csv', 
+    default='roster/roster.txt', 
     help="filename of the guild roster(CSV format)")    
 parser.add_option('-v','--version', action="store_true", dest="version", 
     default=False, help="show program version number and exit")
