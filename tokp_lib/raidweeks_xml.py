@@ -10,6 +10,8 @@ import datetime
 import os
 import xml.dom.minidom
 
+from readifyxml import makeXMLReadable
+
 xml_file = r"raids\raidweeks.xml"
 xml_file2 = r"raids\raidweeks2.xml"
 xml_file3 = r"raids\raidweeks3.xml"
@@ -59,33 +61,34 @@ def load_raidweeks():
 def save_raidweeks(vec_raidweeks):
 
     # start the raidweeks.xml
-    imp = xml.dom.minidom.getDOMImplementation()
-    raidweeks_dom = imp.createDocument(None,"weeks",None)
-    weeks = raidweeks_dom.documentElement
+##    imp = xml.dom.minidom.getDOMImplementation()
+##    raidweeks_dom = imp.createDocument(None,"weeks",None)
+##    base_weeks = raidweeks_dom.documentElement
+##
+##    for str_raidweek in vec_raidweeks:
+##        node_week = raidweeks_dom.createElement("week")
+##        node_dir = raidweeks_dom.createElement("dir")
+##        node_value = raidweeks_dom.createTextNode(str_raidweek)
+##        node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
+##        node_week.appendChild(node_dir)
+##        base_weeks.appendChild(node_week)
+##    out_file = open(xml_file2,'w')
+##    out_file.write(raidweeks_dom.toprettyxml())
+##
+##    test = makeXMLReadable(raidweeks_dom)
+##    print test
+##    print raidweeks_dom.toprettyxml('\t','\n')
+##
+##    # unlink the xml
+##    raidweeks_dom.unlink()
 
-    for str_raidweek in vec_raidweeks:
-        node_week = raidweeks_dom.createElement("week")
-        node_dir = raidweeks_dom.createElement("dir")
-#        node_dir.nodeValue = "test"
-#        node_value = raidweeks_dom.createTextNode(str_raidweek)
-        #node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
-        node_week.appendChild(node_dir)
-        weeks.appendChild(node_week)
-    out_file = open(xml_file2,'w')
-    out_file.write(raidweeks_dom.toprettyxml())
-
-    print raidweeks_dom.toprettyxml('\t','\n')
-
-    out_file = open(xml_file3,'w')
+    out_file = open(xml_file,'w')
     out_file.write('<weeks>\n')
     for str_raidweek in vec_raidweeks:
         out_file.write('\t<week>\n')
         out_file.write('\t\t<dir>%s</dir>\n' % str_raidweek)
         out_file.write('\t</week>\n')
     out_file.write('</weeks>\n')    
-
-    # unlink the xml
-    raidweeks_dom.unlink()
 
     # finished successfully
     return 1
