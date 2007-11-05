@@ -10,7 +10,9 @@ import datetime
 import os
 import xml.dom.minidom
 
-xml_file = r"c:\james\svn\tokp\raids\raidweeks.xml"
+xml_file = r"raids\raidweeks.xml"
+xml_file2 = r"raids\raidweeks2.xml"
+xml_file3 = r"raids\raidweeks3.xml"
 
 ## Get the text out of a nodelist
 def getText(nodelist):
@@ -38,8 +40,7 @@ def load_raidweeks():
     # does it have the base element "weeks"?
     # if not, make a new xml and try again
     if not raidweeks_dom.getElementsByTagName("weeks"):
-        create_raidweeks()
-        raidweeks_dom = xml.dom.minidom.parse(xml_file)
+        return vec_raidweeks
 
     # pull out all "week" elements and add them to the raidweeks list
     raidweeks = raidweeks_dom.getElementsByTagName("week")
@@ -48,11 +49,43 @@ def load_raidweeks():
         raidweek_dir_str = getText(raidweek_dir.childNodes)
         vec_raidweeks.append(raidweek_dir_str)
 
+    # unlink the xml
+    raidweeks_dom.unlink()
+
     return vec_raidweeks
 
 
 ## Write the raidweeks list to raidweeks.xml
-def save_raidweeks():
+def save_raidweeks(vec_raidweeks):
+
+    # start the raidweeks.xml
+    imp = xml.dom.minidom.getDOMImplementation()
+    raidweeks_dom = imp.createDocument(None,"weeks",None)
+    weeks = raidweeks_dom.documentElement
+
+    for str_raidweek in vec_raidweeks:
+        node_week = raidweeks_dom.createElement("week")
+        node_dir = raidweeks_dom.createElement("dir")
+#        node_dir.nodeValue = "test"
+#        node_value = raidweeks_dom.createTextNode(str_raidweek)
+        #node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
+        node_week.appendChild(node_dir)
+        weeks.appendChild(node_week)
+    out_file = open(xml_file2,'w')
+    out_file.write(raidweeks_dom.toprettyxml())
+
+    print raidweeks_dom.toprettyxml('\t','\n')
+
+    out_file = open(xml_file3,'w')
+    out_file.write('<weeks>\n')
+    for str_raidweek in vec_raidweeks:
+        out_file.write('\t<week>\n')
+        out_file.write('\t\t<dir>%s</dir>\n' % str_raidweek)
+        out_file.write('\t</week>\n')
+    out_file.write('</weeks>\n')    
+
+    # unlink the xml
+    raidweeks_dom.unlink()
 
     # finished successfully
     return 1
@@ -72,6 +105,9 @@ def update_raidweeks(options, raid_date):
     if not str_raidweek in vec_raidweeks:
         vec_raidweeks.append(str_raidweek)
         vec_raidweeks.sort()
+
+    # save the updated raidweeks.xml
+    save_raidweeks(vec_raidweeks)
 
     return vec_raidweeks
 
