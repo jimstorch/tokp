@@ -12,20 +12,6 @@ import xml.dom.minidom
 
 xml_file = r"c:\james\svn\tokp\raids\raidweeks.xml"
 
-## Create an empty raidweeks.xml file
-def create_raidweeks():
-
-    empty_raidweeks = """\
-    <weeks>
-    </weeks>
-    """
-    
-    raidweeks_dom = xml.dom.minidom.parseString(empty_raidweeks)
-
-
-    
-    return 1
-
 ## Get the text out of a nodelist
 def getText(nodelist):
     rc = ""
@@ -35,14 +21,18 @@ def getText(nodelist):
     rc = str(rc)
     return rc
 
+
 ## Load the raidweeks.xml file into the raidweeks variable
 def load_raidweeks():
 
+    # define empty raidweeks list
     vec_raidweeks = []
 
+    # does the raidweeks.xml file exist?
     if not os.path.isfile(xml_file):
-        create_raidweeks()
+        return vec_raidweeks
 
+    # parse the raidweeks.xml file
     raidweeks_dom = xml.dom.minidom.parse(xml_file)
 
     # does it have the base element "weeks"?
