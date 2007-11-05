@@ -9,7 +9,7 @@
 import os
 import datetime
 
-from tokp_lib.raidweek_output import raidweek_output
+from tokp_lib.raidweeks_xml import raidweek_output
 
 def write_summary(options, raid_date, raids, loots):
 

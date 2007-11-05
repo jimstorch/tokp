@@ -10,7 +10,7 @@ import datetime
 import os
 import xml.dom.minidom
 
-xml_file = "c:\\james\\svn\\tokp\\raids\\raidweeks.xml"
+xml_file = r"c:\james\svn\tokp\raids\raidweeks.xml"
 
 ## Create an empty raidweeks.xml file
 def create_raidweeks():
@@ -56,7 +56,6 @@ def load_raidweeks():
     for raidweek in raidweeks:
         raidweek_dir = raidweek.getElementsByTagName("dir")[0]
         raidweek_dir_str = getText(raidweek_dir.childNodes)
-        # print "%s" % raidweek_dir_str
         vec_raidweeks.append(raidweek_dir_str)
 
     return vec_raidweeks
@@ -65,19 +64,27 @@ def load_raidweeks():
 ## Write the raidweeks list to raidweeks.xml
 def save_raidweeks():
 
-    # load the raidweeks
-    vec_raidweeks = load_raidweeks()
-
-    # form current raidweek
-    str_raidweek = raidweek_output()
-
     # finished successfully
     return 1
+
 
 ## Update the raidweeks to include the week corresponding to the current raid
 def update_raidweeks(options, raid_date):
 
-    return 1
+    # load the raidweeks
+    vec_raidweeks = load_raidweeks()
+
+    # form current raidweek
+    str_raidweek = raidweek_output(options.raidweek_start, raid_date)
+
+    # check for existence of the current raidweek in the list
+    # insert the current raidweek if necessary
+    if not str_raidweek in vec_raidweeks:
+        vec_raidweeks.append(str_raidweek)
+        vec_raidweeks.sort()
+
+    return vec_raidweeks
+
 
 ## Define a string for the raid week corresponding to the selected date
 def raidweek_output(raidweek_start, raid_date):
