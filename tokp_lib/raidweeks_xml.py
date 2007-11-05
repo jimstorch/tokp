@@ -49,6 +49,7 @@ def load_raidweeks():
     for raidweek in raidweeks:
         raidweek_dir = raidweek.getElementsByTagName("dir")[0]
         raidweek_dir_str = getText(raidweek_dir.childNodes)
+        raidweek_dir_str = raidweek_dir_str.strip('\n\t')
         vec_raidweeks.append(raidweek_dir_str)
 
     # unlink the xml
@@ -61,34 +62,28 @@ def load_raidweeks():
 def save_raidweeks(vec_raidweeks):
 
     # start the raidweeks.xml
-##    imp = xml.dom.minidom.getDOMImplementation()
-##    raidweeks_dom = imp.createDocument(None,"weeks",None)
-##    base_weeks = raidweeks_dom.documentElement
-##
-##    for str_raidweek in vec_raidweeks:
-##        node_week = raidweeks_dom.createElement("week")
-##        node_dir = raidweeks_dom.createElement("dir")
-##        node_value = raidweeks_dom.createTextNode(str_raidweek)
-##        node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
-##        node_week.appendChild(node_dir)
-##        base_weeks.appendChild(node_week)
-##    out_file = open(xml_file2,'w')
-##    out_file.write(raidweeks_dom.toprettyxml())
-##
-##    test = makeXMLReadable(raidweeks_dom)
-##    print test
-##    print raidweeks_dom.toprettyxml('\t','\n')
-##
-##    # unlink the xml
-##    raidweeks_dom.unlink()
+    imp = xml.dom.minidom.getDOMImplementation()
+    raidweeks_dom = imp.createDocument(None,"weeks",None)
+    base_weeks = raidweeks_dom.documentElement
 
-    out_file = open(xml_file,'w')
-    out_file.write('<weeks>\n')
     for str_raidweek in vec_raidweeks:
-        out_file.write('\t<week>\n')
-        out_file.write('\t\t<dir>%s</dir>\n' % str_raidweek)
-        out_file.write('\t</week>\n')
-    out_file.write('</weeks>\n')    
+        node_week = raidweeks_dom.createElement("week")
+        node_dir = raidweeks_dom.createElement("dir")
+        node_value = raidweeks_dom.createTextNode(str_raidweek)
+        node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
+        node_week.appendChild(node_dir)
+        base_weeks.appendChild(node_week)
+    out_file = open(xml_file,'w')
+    out_file.write(raidweeks_dom.toprettyxml())
+    raidweeks_dom.unlink()
+
+##    out_file = open(xml_file2,'w')
+##    out_file.write('<weeks>\n')
+##    for str_raidweek in vec_raidweeks:
+##        out_file.write('\t<week>\n')
+##        out_file.write('\t\t<dir>%s</dir>\n' % str_raidweek)
+##        out_file.write('\t</week>\n')
+##    out_file.write('</weeks>\n')    
 
     # finished successfully
     return 1
