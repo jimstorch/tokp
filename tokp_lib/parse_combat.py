@@ -66,6 +66,31 @@ def find_name(event):
     return name
 
 
+def is_pet(event):
+
+    if ' Feed Pet Effect ' in event:
+        return 1
+    elif ' Kill Command ' in event:
+        return 1
+    elif ' Mend Pet.' in event:
+        return 1
+    else:
+        return 0
+
+def is_mage(event):
+    if ' Arcane Blast ' in event:
+        return 1
+    elif ' Arcane Missiles ' in event:
+        return 1
+    elif ' Fireball hits ' in event:
+        return 1
+    elif ' Scorch hits ' in event:
+        return 1
+    elif ' Fireblast ' in event:
+        return 1
+    else:
+        return 0
+
 #--[ Raid Class ]--------------------------------------------------------------
 
 class Raid(object):
