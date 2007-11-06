@@ -65,31 +65,19 @@ def find_name(event):
             name = match_obj.group('name') 
     return name
 
+# determine which class the current line contains
+def is_class(line):
+    rogue_spells = set(['Anesthetic Poison','Ambush','Feint','Backstab','Sinister Strike'])
+    mage_spells = set(['Arcane Blast','Arcane Missiles','Fireball hits','Scorch hits','Fireblast'])
+    pet_spells = set(['Feed Pet Effect','Feed Pet Effect','Kill Command','Mend Pet'])
 
-def is_pet(event):
-
-    if ' Feed Pet Effect ' in event:
-        return 1
-    elif ' Kill Command ' in event:
-        return 1
-    elif ' Mend Pet.' in event:
-        return 1
-    else:
-        return 0
-
-def is_mage(event):
-    if ' Arcane Blast ' in event:
-        return 1
-    elif ' Arcane Missiles ' in event:
-        return 1
-    elif ' Fireball hits ' in event:
-        return 1
-    elif ' Scorch hits ' in event:
-        return 1
-    elif ' Fireblast ' in event:
-        return 1
-    else:
-        return 0
+    class_spells = {'rogue':rogue_spells, 'mage':mage_spells, 'pet':pet_spells}
+    for cur_class, cur_spells in class_spells.iteritems():
+        for cur_spell in cur_spells:
+            if cur_spell in line:
+                return cur_class
+    
+    return 0
 
 #--[ Raid Class ]--------------------------------------------------------------
 
