@@ -17,9 +17,8 @@ compile_obj = re.compile(rawstr)
 
 
 #--[ Converting Datetime Objects ]---------------------------------------------
-
-## Seems like a lot of juggling but strftime() and strptime() don't support
-## microseconds.
+# Seems like a lot of juggling but strftime() and strptime() don't support
+# microseconds.
 
 def dt_to_str(dt):
     ## Convert a datetime to a string formated YYYY-MM-DD HH:MM:SS:MMMMMM
@@ -44,22 +43,47 @@ def str_to_dt(string):
         raise ValueError('Could not parse datetime string')    
 
 
+#--[ Indent ]------------------------------------------------------------------
+# From http://effbot.org/zone/element-lib.htm (plus Paul Du Bois comment)
+
+def indent(elem, level=0):
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for child in elem:
+            indent(child, level+1)
+        if not child.tail or not child.tail.strip():
+            child.tail = i
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
+
 #--[ Raid to XML ]-------------------------------------------------------------
 
 def raid_to_xml(raid):
-    
-    #xml = et.Element('raid', zone = raid.zone, 
-    #    start_time = dt_to_str(raid.start_time),
-    #    end_time = dt_to_str(raid.end_time))
-    
+   
     xml = et.Element('raid')
     zone = et.SubElement(xml,'zone')
     zone.text = raid.zone
-            
+    start_time = et.SubElement(xml,'start_time')
+    start_time.text = dt_to_str(raid.start_time)
+    end_time = et.SubElement(xml,'end_time')
+    end_time.text = dt_to_str(raid.end_time)
+    members = et.SubElement(xml,'members')
+    raid.raid_members.sort()
     for member in raid.raid_members:
-        guy = et.Element('member',name=member)
-        xml.append(guy)  
+        name = et.SubElement(members,'name')
+        name.text = member
 
+
+    tree = et.ElementTree(xml)
+    indent(xml)
+    f = open('text.xml','w')
+    tree.write(f, 'utf-8')
     return et.tostring(xml)
 
     
