@@ -24,6 +24,6 @@ for member in ['Redguy','Greenguy','Blueguy','Orangeguy','Greyguy','Brownguy']:
     raid.add_member(member, timestamp)
 raid.end_time = timestamp + ten_minutes    
 
-xml = raid_to_xml(raid)
+raid_xml = raid_to_xml(raid)
 
-print xml
+print raid_xml

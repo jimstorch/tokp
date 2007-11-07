@@ -48,9 +48,13 @@ def str_to_dt(string):
 
 def raid_to_xml(raid):
     
-    xml = et.Element('raid', zone = raid.zone, 
-        start_time = dt_to_str(raid.start_time),
-        end_time = dt_to_str(raid.end_time))
+    #xml = et.Element('raid', zone = raid.zone, 
+    #    start_time = dt_to_str(raid.start_time),
+    #    end_time = dt_to_str(raid.end_time))
+    
+    xml = et.Element('raid')
+    zone = et.SubElement(xml,'zone')
+    zone.text = raid.zone
             
     for member in raid.raid_members:
         guy = et.Element('member',name=member)
