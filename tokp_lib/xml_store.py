@@ -17,7 +17,7 @@ compile_obj = re.compile(rawstr)
 
 
 #--[ Converting Datetime Objects ]---------------------------------------------
-# Seems like a lot of juggling but strftime() and strptime() don't support
+# Seems like a lot of juggling but strftime() and strptime() do not support
 # microseconds.
 
 def dt_to_str(dt):
@@ -47,7 +47,7 @@ def str_to_dt(string):
 # From http://effbot.org/zone/element-lib.htm (plus Paul Du Bois comment)
 
 def indent(elem, level=0):
-    i = "\n" + level*"    "
+    i = "\n" + level * "    "
     if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = i + "    "
@@ -62,11 +62,13 @@ def indent(elem, level=0):
             elem.tail = i
 
 
-#--[ Raid to XML ]-------------------------------------------------------------
+#--[ Write Raid XML ]----------------------------------------------------------
 
-def raid_to_xml(raid):
-   
-    xml = et.Element('raid')
+def write_raid_xml(raid):
+    
+    fname = raid.start_time.strftime("%Y%m%d.%H%M.") + raid.zone + '.xml'
+    dstr = raid.start_time.strftime("%m/%d/%Y")
+    xml = et.Element('raid',date = dstr)
     zone = et.SubElement(xml,'zone')
     zone.text = raid.zone
     start_time = et.SubElement(xml,'start_time')
@@ -82,10 +84,13 @@ def raid_to_xml(raid):
 
     tree = et.ElementTree(xml)
     indent(xml)
-    f = open('text.xml','w')
+    indent(xml)
+    f = open('raids/' + fname,'w')
+    #f.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
     tree.write(f, 'utf-8')
-    return et.tostring(xml)
+    #print et.tostring(xml)
 
-    
+
+#--[ Read Raid XML ]-----------------------------------------------------------  
 
 

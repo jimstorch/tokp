@@ -8,20 +8,32 @@
 #------------------------------------------------------------------------------
 
 import datetime
+import random
 
 from tokp_lib.parse_combat import Raid 
-from tokp_lib.xml_store import raid_to_xml
-
+from tokp_lib.xml_store import write_raid_xml
 
 timestamp = datetime.datetime.now()
 ten_minutes = datetime.timedelta(minutes=10)
 
-raid = Raid('Test Zone', timestamp)
-for member in ['Redguy','Greenguy','Blueguy','Orangeguy','Greyguy','Brownguy']:
+
+zones = ['Mines of Moria','Mordor','Minas Morgul','Dennys']
+
+guild = ['Everard', 'Sam', 'Sauron', 'Boromir', 'Galadriel',
+    'Legolas', 'Peregrin', 'Celeborn', 'Proudfoot', 'Gilgalad',
+    'Bilbo', 'Saruman','Lurtz', 'Gandalf', 'Lendil', 
+    'Rosie', 'Merry', 'Aragorn', 'Bounder', 'Haldir',
+    'Maggot', 'Gimli', 'Gollum', 'Isildur','Arwen',
+    'Barliman', 'Elrond', 'Frodo', 'Larry', 'Curly']
+
+zone = random.choice(zones)
+raid = Raid(zone, timestamp)
+## make a raid of 20 random members
+while len(raid.raid_members) < 20:
     timestamp += ten_minutes
-    raid.add_member(member, timestamp)
-raid.end_time = timestamp + ten_minutes    
+    raid.add_member(random.choice(guild), timestamp)
 
-raid_xml = raid_to_xml(raid)
+raid.end_time = timestamp + ten_minutes
 
-print raid_xml
+write_raid_xml(raid)    
+
