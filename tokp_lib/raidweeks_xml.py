@@ -8,7 +8,6 @@
 
 import datetime
 import os
-import xml.dom.minidom
 from xml.etree import cElementTree as et
 
 from tokp_lib.xml_store import indent
@@ -37,24 +36,23 @@ def load_raidweeks():
     if not os.path.isfile(xml_file):
         return vec_raidweeks
 
-    # parse the raidweeks.xml file
-    raidweeks_dom = xml.dom.minidom.parse(xml_file)
+    # load the raidweeks.xml file
+    tree = et.parse(xml_file)
 
-    # does it have the base element "weeks"?
-    # if not, make a new xml and try again
-    if not raidweeks_dom.getElementsByTagName("weeks"):
+    # does the base element "weeks" exist?
+    doc = tree.getroot().findall("weeks")
+    if not len(doc) == 1:
         return vec_raidweeks
 
-    # pull out all "week" elements and add them to the raidweeks list
-    raidweeks = raidweeks_dom.getElementsByTagName("week")
-    for raidweek in raidweeks:
-        raidweek_dir = raidweek.getElementsByTagName("dir")[0]
-        raidweek_dir_str = getText(raidweek_dir.childNodes)
-        raidweek_dir_str = raidweek_dir_str.strip('\n\t')
+    # loop through all "week" elements
+    weeks = tree.getroot().findall("week")
+    for week in weeks:
+        # pull out the "dir" children (if more than one, use the first)
+        raidweek_dir = week.findall("dir")
+        if not len(raidweek_dir) == 1:
+            print "Error: Too many <dir></dir> elements in raidweeks.xml"
+        raidweek_dir_str = raidweek_dir[0].text
         vec_raidweeks.append(raidweek_dir_str)
-
-    # unlink the xml
-    raidweeks_dom.unlink()
 
     return vec_raidweeks
 
