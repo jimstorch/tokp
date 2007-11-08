@@ -15,7 +15,7 @@ GuildMember.Scores.Rot = 0;
 
 AttendanceUpper = [0.10, 0.25, 0.50, 0.75, 1.00]
 PointsPerDay = [0.0, 0.4, 0.8, 1.6, 2.0]
-PointDecay = [0.0/7.0, 0.0/7.0, 2.0/7.0, 4.0/7.0, 8.0/7.0, 10.0/7.0]
+PointDecay = [0.0, 0.0, 2.0, 4.0, 8.0, 10.0]
 
 days = 2;
 
@@ -24,12 +24,20 @@ def add_points(GuildMember, days)
     # are points decaying?
     if GuildMember.Participation == 0
         WeeksAtZero = days // 7.0
+        ExtraDays = days - WeeksAtZero * 7
+        PointsLost = 0
+
+        if WeeksAtZero > 1
+            PointsLost = PointsLost - PointDecay[0]
+        if WeeksAtZero > 1
+            PointsLost = PointsLost - PointDecay[0]
+
         
-        for 
-        return 0
+        return PointsLost
 
     # determine points to add
+    PointsAdded = 0
     for CurAttendanceUpper, CurPointsPerDay in AttendanceUpper, PointsPerDay
         if GuildMember.Participation < CurArrendanceUpper
-            Points = CurPointsPerDay * days
-            return Points
+            PointsAdded = CurPointsPerDay * days
+            return PointsAdded
