@@ -9,10 +9,11 @@
 import datetime
 import os
 import xml.dom.minidom
+from xml.etree import cElementTree as et
 
-from readifyxml import makeXMLReadable
+from tokp_lib.xml_store import indent
 
-xml_file = r"raids\raidweeks.xml"
+xml_file = r"data\raids\raidweeks.xml"
 xml_file2 = r"raids\raidweeks2.xml"
 xml_file3 = r"raids\raidweeks3.xml"
 
@@ -61,30 +62,20 @@ def load_raidweeks():
 ## Write the raidweeks list to raidweeks.xml
 def save_raidweeks(vec_raidweeks):
 
-    # start the raidweeks.xml
-    imp = xml.dom.minidom.getDOMImplementation()
-    raidweeks_dom = imp.createDocument(None,"weeks",None)
-    base_weeks = raidweeks_dom.documentElement
-
+    # make the xml tree
+    xml = et.Element('weeks')
     for str_raidweek in vec_raidweeks:
-        node_week = raidweeks_dom.createElement("week")
-        node_dir = raidweeks_dom.createElement("dir")
-        node_value = raidweeks_dom.createTextNode(str_raidweek)
-        node_dir.appendChild(raidweeks_dom.createTextNode(str_raidweek))
-        node_week.appendChild(node_dir)
-        base_weeks.appendChild(node_week)
-    out_file = open(xml_file,'w')
-    out_file.write(raidweeks_dom.toprettyxml())
-    raidweeks_dom.unlink()
+        el_week = et.SubElement(xml,'week')
+        el_dir = et.SubElement(el_week,'dir')
+        el_dir.text = str_raidweek
+    tree = et.ElementTree(xml)
+    indent(xml)
+    indent(xml)
 
-##    out_file = open(xml_file2,'w')
-##    out_file.write('<weeks>\n')
-##    for str_raidweek in vec_raidweeks:
-##        out_file.write('\t<week>\n')
-##        out_file.write('\t\t<dir>%s</dir>\n' % str_raidweek)
-##        out_file.write('\t</week>\n')
-##    out_file.write('</weeks>\n')    
-
+    # write the xml tree to file
+    f = open(xml_file,'w')
+    tree.write(f, 'utf-8')
+    
     # finished successfully
     return 1
 
