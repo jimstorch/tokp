@@ -7,16 +7,19 @@
 #------------------------------------------------------------------------------
 
 import datetime
+from string import lower
 
 test1 = (datetime.date(2007,10,23), "Participation", 4)
 test2 = (datetime.date(2007,10,30), "Participation", 0)
 test3 = (datetime.date(2007,11,02), "Loot", "Epic", "Epic Helm of Crap")
 test4 = (datetime.date(2007,11,06), "Participation", 0)
 Events = {"Sarkoris" : [test1, test2, test3, test4]}
-Scores = {"Sarkoris" : [0.00, 0.00, 0.00]}
+Scores = {"Sarkoris" : [0.00, 0.00, 0.00, 0.00]}
 
 PointsPerDay = {0.5 : 0.00, 1 : 0.40, 2: 0.80, 3: 1.60, 4 : 2.00}
 PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
+ValueCosts = {"epic":(20,50) , "rare":(20,50), "uncommon":(20,50), "common":(20,50)}
+MaxCost = 50
 
 def scan_player_changes(Events, Scores):
 
@@ -25,7 +28,7 @@ def scan_player_changes(Events, Scores):
         WeeksAtZero = 0;
         for index, Event in enumerate(MemberEvents):
             # deal with the current event
-            if Event[1] == "Participation":
+            if lower(Event[1]) == "participation":
                 # find the days until next event
                 if index < len(MemberEvents)-1:
                     NextEvent = MemberEvents[index+1]
@@ -40,14 +43,14 @@ def scan_player_changes(Events, Scores):
                 else:
                     WeeksAtZero = 0
                     Scores[Member] = add_points(Scores[Member], Event[2], DaysElapsed)
-            elif Event[1] == "Loot":
+            elif lower(Event[1]) == "loot":
                 Scores[Member] = subtract_loot(Event[2], Scores[Member])
             print Scores[Member]
     return
 
 
 def add_points(OldScores, Participation, DaysElapsed):
-    NewScores = [0, 0, 0]
+    NewScores = [0, 0, 0, 0]
 
     # determine points to add
     PointsAdded = PointsPerDay[Participation] * DaysElapsed
@@ -56,7 +59,7 @@ def add_points(OldScores, Participation, DaysElapsed):
     return NewScores
 
 def decay_points(OldScores, WeeksAtZero, DaysElapsed):
-    NewScores = [0, 0, 0]
+    NewScores = [0, 0, 0, 0]
 
     if WeeksAtZero > 5:
         WeeksAtZero = 5
@@ -73,4 +76,47 @@ def decay_points(OldScores, WeeksAtZero, DaysElapsed):
     return NewScores
 
 def subtract_loot(LootValue, Scores):
-    return Scores
+    NewScores = [0, 0, 0, 0]
+
+    if lower(LootValue) == "epic":
+        NewScores[0] = reset_score(LootValue, Scores[0])
+        NewScores[1] = reset_score(LootValue, Scores[1])
+        NewScores[2] = reset_score(LootValue, Scores[2])
+        NewScores[3] = reset_score(LootValue, Scores[3])
+    elif lower(LootValue) == "rare":
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](1)
+        NewScores[1] = reset_score(LootValue, Scores[1])
+        NewScores[2] = reset_score(LootValue, Scores[2])
+        NewScores[3] = reset_score(LootValue, Scores[3])
+    elif lower(LootValue) == "uncommon":
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](2)
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](2)
+        NewScores[2] = reset_score(LootValue, Scores[2])
+        NewScores[3] = reset_score(LootValue, Scores[3])
+    elif lower(LootValue) == "common":
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](3)
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](3)
+        NewScores[0] = Scores[0] - ValueCosts[lower(LootValue)](3)
+        NewScores[3] = reset_score(LootValue, Scores[3])
+    else:
+        print "you fucked up"
+        
+    return NewScores
+
+def reset_score(LootValue, Score):
+
+    # minimum cost
+    MinCost = ValueCosts[lower(LootValue)][0]
+    
+    # reset cost
+    ResetCost = 0.75 * Score
+
+    # chose which cost to use
+    if ResetCost < MinCost:
+        NewScore = Score - MinCost
+    elif ResetCost > MaxCost:
+        NewScore = Score - MaxCost
+    else:
+        NewScore = Score - ResetCost
+    
+    return NewScore
