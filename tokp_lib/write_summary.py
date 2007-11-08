@@ -11,12 +11,14 @@ import datetime
 
 from tokp_lib.raidweeks_xml import raidweek_output
 
+
+
 def write_summary(options, raid_date, raids, loots):
 
     # make the file name
     datestr = raid_date.strftime('%Y-%m-%d')
     raidweekstr = raidweek_output(options.raidweek_start, raid_date)
-    output_path = ('raids/%s' % raidweekstr)
+    output_path = ('data/raids/%s' % raidweekstr)
     if not os.path.isdir(output_path):
         os.mkdir(output_path)
     filename = ('%s/%s_%s.txt' % (output_path, datestr, options.name))
