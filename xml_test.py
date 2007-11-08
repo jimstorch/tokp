@@ -12,8 +12,6 @@ import datetime
 from tokp_lib.parse_combat import Raid 
 from tokp_lib.xml_store import raid_to_xml
 
-from tokp_lib.xml_store import dt_to_str, str_to_dt
-
 
 timestamp = datetime.datetime.now()
 ten_minutes = datetime.timedelta(minutes=10)
