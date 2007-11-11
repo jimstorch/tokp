@@ -16,16 +16,28 @@ test4 = (datetime.date(2007,10,30), "Participation", 0)
 test5 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
 test6 = (datetime.date(2007,11,2), "lOOT", "common", "Epic Pants of Crap")
 test7 = (datetime.date(2007,11,6), "Participation", 0.5)
-Events = {"Sarkoris" : [test1, test2, test3, test4, test5, test6, test7]}
-Scores = {"Sarkoris" : [0.00, 0.00, 0.00, 0.00]}
+test8 = (datetime.date(2007,10,9), "Participation", 4)
+test9 = (datetime.date(2007,10,16), "Participation", 4)
+test10 = (datetime.date(2007,10,23), "Participation", 4)
+test11 = (datetime.date(2007,10,30), "Participation", 0)
+test12 = (datetime.date(2007,11,6), "Participation", 0.5)
+Events = {"Sarkoris" : [test1, test2, test3, test4, test5, test6, test7],
+          "Lias": [test8, test9, test10, test11, test12]}
 
-def test_stuff(Events, Scores):
+def test_stuff(Events):
+    Scores = {}
+    IncScores = {}
+    Seniority = {}
     # loop through members
     for Member in Events.keys():
         MemberEvents = Events[Member]
         Stuff = ComputeScore(MemberEvents)
-        Scores = Stuff.return_scores()
-        print Scores
+        Scores[Member] = Stuff.return_scores()
+        IncScores[Member] = Stuff.return_incscores()
+        Seniority[Member] = Stuff.return_seniority()
+    #print Scores
+    print IncScores["Sarkoris"]
+    #print Seniority
     return
 
 #--[ ComputeScore Class ]------------------------------------------------------
@@ -41,10 +53,18 @@ class ComputeScore(object):
     def __init__(self, MemberEvents):
         self.MemberEvents = MemberEvents
         self.Scores = [0.00, 0.00, 0.00, 0.00]
+        self.IncScores = {}
+        self.Seniority = []
         self.scan_player_changes()
 
     def return_scores(self):
         return self.Scores
+
+    def return_incscores(self):
+        return self.IncScores
+
+    def return_seniority(self):
+        return self.Seniority
 
     def print_scores(self):
         # stupid, i know, but it simplifies one line!
@@ -56,14 +76,25 @@ class ComputeScore(object):
 
         # loop through member events
         for index, Event in enumerate(self.MemberEvents):
+            # find the days until next event
+            if index < len(self.MemberEvents)-1:
+                NextEvent = self.MemberEvents[index+1]
+            else:
+                NextEvent = (datetime.date.today(), "End")
+            Delta = NextEvent[0] - Event[0]
+            DaysElapsed = Delta.days
+
+            # store old scores, days elapsed
+            CurDate = Event[0]
+            CurScores = self.Scores
+            self.IncScores[CurDate] = []
+            self.IncScores[CurDate].append(CurScores)
+            self.IncScores[CurDate].append(DaysElapsed)
+            print self.Scores
+
             if lower(Event[1]) == "participation":
-                # find the days until next event
-                if index < len(self.MemberEvents)-1:
-                    NextEvent = self.MemberEvents[index+1]
-                else:
-                    NextEvent = (datetime.date.today(), "End")
-                Delta = NextEvent[0] - Event[0]
-                DaysElapsed = Delta.days
+                self.Seniority.append(Event[2])
+
                 # update weeks at zero
                 if Event[2] == 0:
                     self.WeeksAtZero = self.WeeksAtZero + 1
@@ -73,7 +104,9 @@ class ComputeScore(object):
                     self.add_points(Event[2], DaysElapsed)
             elif lower(Event[1]) == "loot":
                 self.subtract_loot(Event[2])
-            #self.print_scores()
+
+            # store updated scores
+            self.IncScores[CurDate].append(self.Scores)
         return
 
 
