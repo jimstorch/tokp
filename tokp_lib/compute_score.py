@@ -36,7 +36,7 @@ def test_stuff(Events):
         IncScores[Member] = Stuff.return_incscores()
         Seniority[Member] = Stuff.return_seniority()
     #print Scores
-    print IncScores["Sarkoris"]
+    #print IncScores["Sarkoris"]
     #print Seniority
     return
 
@@ -85,12 +85,10 @@ class ComputeScore(object):
             DaysElapsed = Delta.days
 
             # store old scores, days elapsed
-            CurDate = Event[0]
-            CurScores = self.Scores
-            self.IncScores[CurDate] = []
-            self.IncScores[CurDate].append(CurScores)
-            self.IncScores[CurDate].append(DaysElapsed)
-            print self.Scores
+            self.IncScores[Event[0]] = []
+            self.IncScores[Event[0]].append(self.Scores)
+            self.IncScores[Event[0]].append(DaysElapsed)
+            #print self.Scores
 
             if lower(Event[1]) == "participation":
                 self.Seniority.append(Event[2])
@@ -106,7 +104,8 @@ class ComputeScore(object):
                 self.subtract_loot(Event[2])
 
             # store updated scores
-            self.IncScores[CurDate].append(self.Scores)
+            self.IncScores[Event[0]].append(self.Scores)
+            print self.IncScores[Event[0]]
         return
 
 
