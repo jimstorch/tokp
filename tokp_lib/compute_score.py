@@ -13,35 +13,36 @@ test1 = (datetime.date(2007,10,9), "Participation", 4)
 test2 = (datetime.date(2007,10,16), "Participation", 4)
 test3 = (datetime.date(2007,10,23), "Participation", 4)
 test4 = (datetime.date(2007,10,30), "Participation", 0)
-test5 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
-test6 = (datetime.date(2007,11,2), "lOOT", "common", "Epic Pants of Crap")
-test7 = (datetime.date(2007,11,6), "Participation", 0.5)
-test8 = (datetime.date(2007,10,9), "Participation", 4)
-test9 = (datetime.date(2007,10,16), "Participation", 4)
-test10 = (datetime.date(2007,10,23), "Participation", 4)
-test11 = (datetime.date(2007,10,30), "Participation", 0)
-test12 = (datetime.date(2007,11,6), "Participation", 0.5)
-Events = {"Sarkoris" : [test1, test2, test3, test4, test5, test6, test7],
-          "Lias": [test8, test9, test10, test11, test12]}
+test5 = (datetime.date(2007,11,1), "Bonus", 10, "a very good reason")
+test6 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
+test7 = (datetime.date(2007,11,2), "lOOT", "common", "Epic Pants of Crap")
+test8 = (datetime.date(2007,11,6), "Participation", 0.5)
+test9 = (datetime.date(2007,10,9), "Participation", 4)
+test10 = (datetime.date(2007,10,16), "Participation", 4)
+test11 = (datetime.date(2007,10,23), "Participation", 4)
+test12 = (datetime.date(2007,10,30), "Participation", 0)
+test13 = (datetime.date(2007,11,6), "Participation", 0.5)
+Events = {"Sarkoris" : [test1, test2, test3, test4, test5, test6, test7, test8],
+          "Lias": [test9, test10, test11, test12, test13]}
 
 def test_stuff(Events):
     Scores = {}
-    IncScores = {}
+    IncScores = ()
     Seniority = {}
     # loop through members
     for Member in Events.keys():
         MemberEvents = Events[Member]
-        Stuff = ComputeScore(MemberEvents)
-        Scores[Member] = Stuff.return_scores()
-        IncScores[Member] = Stuff.return_incscores()
-        Seniority[Member] = Stuff.return_seniority()
-    #print Scores
-    #print IncScores["Sarkoris"]
-    #print Seniority
+        Sarkoris = GuildMember()
+        Sarkoris.ScanMemberEvents(MemberEvents)
+    print Sarkoris.Scores
+    #print Sarkoris.IncScores
+    #print Sarkoris.SeniorityVec
+    #print Sarkoris.Seniority
+    #print Sarkoris.SeniorityLastMonth
     return
 
 #--[ ComputeScore Class ]------------------------------------------------------
-class ComputeScore(object):
+class GuildMember(object):
     
     # defined by loot system rules:
     PointsPerDay = {0.5 : 0.00, 1 : 0.40, 2: 0.80, 3: 1.60, 4 : 2.00}
@@ -50,48 +51,43 @@ class ComputeScore(object):
     MinCost = 20
     MaxCost = 50
 
-    def __init__(self, MemberEvents):
-        self.MemberEvents = MemberEvents
+    def __init__(self):
         self.Scores = [0.00, 0.00, 0.00, 0.00]
-        self.IncScores = {}
-        self.Seniority = []
-        self.scan_player_changes()
-
-    def return_scores(self):
-        return self.Scores
-
-    def return_incscores(self):
-        return self.IncScores
-
-    def return_seniority(self):
-        return self.Seniority
+        self.IncScores = []
+        self.SeniorityVec = []
+        self.Seniority = 0;
+        self.SeniorityLastMonth = 0;
 
     def print_scores(self):
         # stupid, i know, but it simplifies one line!
         print "%4.1f %4.1f %4.1f %4.1f" % (self.Scores[0], self.Scores[1], self.Scores[2], self.Scores[3])
         return
 
-    def scan_player_changes(self):
+    def get_days_elapsed(self, index, Event):
+        if index < len(self.MemberEvents)-1:
+            NextEvent = self.MemberEvents[index+1]
+        else:
+            NextEvent = (datetime.date.today(), "End")
+        Delta = NextEvent[0] - Event[0]
+        return Delta.days
+
+    def ScanMemberEvents(self, MemberEvents):
+        self.MemberEvents = MemberEvents
         self.WeeksAtZero = 0;
 
         # loop through member events
         for index, Event in enumerate(self.MemberEvents):
             # find the days until next event
-            if index < len(self.MemberEvents)-1:
-                NextEvent = self.MemberEvents[index+1]
-            else:
-                NextEvent = (datetime.date.today(), "End")
-            Delta = NextEvent[0] - Event[0]
-            DaysElapsed = Delta.days
+            DaysElapsed = self.get_days_elapsed(index, Event)  
 
             # store old scores, days elapsed
-            self.IncScores[Event[0]] = []
-            self.IncScores[Event[0]].append(self.Scores)
-            self.IncScores[Event[0]].append(DaysElapsed)
+            #self.IncScores[Event[0]] = []
+            #self.IncScores[Event[0]].append(self.Scores)
+            #self.IncScores[Event[0]].append(DaysElapsed)
             #print self.Scores
 
             if lower(Event[1]) == "participation":
-                self.Seniority.append(Event[2])
+                self.SeniorityVec.append(Event[2])
 
                 # update weeks at zero
                 if Event[2] == 0:
@@ -102,10 +98,12 @@ class ComputeScore(object):
                     self.add_points(Event[2], DaysElapsed)
             elif lower(Event[1]) == "loot":
                 self.subtract_loot(Event[2])
-
+            elif lower(Event[1]) == "bonus":
+                self.bonus_points(Event[2], Event[3])
             # store updated scores
-            self.IncScores[Event[0]].append(self.Scores)
-            print self.IncScores[Event[0]]
+            #self.IncScores[Event[0]].append(self.Scores)
+            #print self.IncScores[Event[0]]
+            self.update_seniority()
         return
 
 
@@ -182,5 +180,19 @@ class ComputeScore(object):
             NewScore = Score - ResetCost
         
         return NewScore
+
+    def bonus_points(self, Bonus, Reason):
+        for index, OldScore in enumerate(self.Scores):
+            self.Scores[index] = self.Scores[index] + Bonus
+        return
+
+    def update_seniority(self):
+        self.Seniority = 0
+        self.SeniorityLastMonth = 0
+        for i, Participation in enumerate(self.SeniorityVec):
+            self.Seniority = self.Seniority + Participation
+            if i >= len(self.SeniorityVec) - 4:
+                self.SeniorityLastMonth = self.SeniorityLastMonth + Participation
+        return
 #------------------------------------------------------------------------------
     
