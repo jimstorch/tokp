@@ -64,11 +64,6 @@ class GuildMember(object):
         self.SeniorityLastMonth = 0;
         self.DebugReport = ""
 
-    def print_scores(self):
-        # stupid, i know, but it simplifies one line!
-        print "%4.1f %4.1f %4.1f %4.1f" % (self.Scores[0], self.Scores[1], self.Scores[2], self.Scores[3])
-        return
-
     def get_days_elapsed(self, index, Event):
         if index < len(self.MemberEvents)-1:
             NextEvent = self.MemberEvents[index+1]
@@ -190,10 +185,8 @@ class GuildMember(object):
         return
 
     def reset_score(self, LootValue, Score):
-
         # reset cost
         ResetCost = 0.75 * Score
-
         # chose which cost to use
         if ResetCost < self.MinCost:
             NewScore = Score - self.MinCost
@@ -201,7 +194,6 @@ class GuildMember(object):
             NewScore = Score - self.MaxCost
         else:
             NewScore = Score - ResetCost
-        
         return NewScore
 
     def bonus_points(self, Bonus, Reason):
