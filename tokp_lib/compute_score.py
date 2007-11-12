@@ -8,7 +8,8 @@
 
 import datetime
 import string
-#from string import lower
+from string import lower
+from string import capwords
 
 test0 = (datetime.date(2007,10,9), "Add Member")
 test1 = (datetime.date(2007,10,9), "Participation", 4)
@@ -38,10 +39,11 @@ def test_stuff(Events):
         Sarkoris = GuildMember()
         Sarkoris.ScanMemberEvents(MemberEvents)
     #print Sarkoris.Scores
-    #print Sarkoris.IncScores
-    print Sarkoris.SeniorityVec
-    print Sarkoris.Seniority
-    print Sarkoris.SeniorityLastMonth
+    for IncScore in Sarkoris.IncScores:
+        print IncScore
+    #print Sarkoris.SeniorityVec
+    #print Sarkoris.Seniority
+    #print Sarkoris.SeniorityLastMonth
     #print Sarkoris.DebugReport
     return
 
@@ -51,13 +53,15 @@ class GuildMember(object):
     # defined by loot system rules:
     PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
     PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
-    ValueCosts = {"epic":20 , "rare":6, "uncommon":3, "zg":1}
+    ValueLabels = {"epic":1, "rare":2, "uncommon":3, "zg":4}
+    ValueCosts = {1:20 , 2:6, 3:3, 4:1}
     MinCost = 20
     MaxCost = 50
 
     def __init__(self):
         self.MemberEvents = []
-        self.Scores = [0.00, 0.00, 0.00, 0.00]
+        #self.Scores = [0.00, 0.00, 0.00, 0.00]
+        self.Scores = {1:0.00, 2:0.00, 3:0.00, 4:0.00}
         self.IncScores = []
         self.SeniorityVec = []
         self.Seniority = 0;
@@ -75,60 +79,73 @@ class GuildMember(object):
     def ScanMemberEvents(self, MemberEvents):
         self.MemberEvents = MemberEvents
         self.WeeksAtZero = 0;
+        vecIncScores = ()
 
         # loop through member events
         for index, Event in enumerate(self.MemberEvents):
-            NewDebugLine = ""
+
             # find the days until next event
             DaysElapsed = self.get_days_elapsed(index, Event)  
+            NewDebugLine = self.debug_line_start(Event, DaysElapsed)
 
-            # store old scores, days elapsed
-            NewDebugLine = NewDebugLine + "[" + Event[0].strftime('%Y-%m-%d') + "] "
-            NewDebugLine = NewDebugLine + ("[%d] " % DaysElapsed)
-            NewDebugLine = NewDebugLine + "["
-            for Score in self.Scores:
-                NewDebugLine = NewDebugLine + (" %3d" % Score)
-            NewDebugLine = NewDebugLine + " ] "
-            #self.IncScores[Event[0]] = []
-            #self.IncScores[Event[0]].append(self.Scores)
-            #self.IncScores[Event[0]].append(DaysElapsed)
-            #print self.Scores
-
+            # "add member" event
             if lower(Event[1]) == "add member":
                 NewDebugLine = NewDebugLine + ("%-20s [%-8s] " % (Event[1], ""))
+            # "participation" event
             elif lower(Event[1]) == "participation":
                 self.SeniorityVec.append(Event[2])
                 NewDebugLine = NewDebugLine + ("%-20s [%-8d] " % (Event[1], Event[2]))
-
-                # update weeks at zero
                 if Event[2] == 0:
                     self.WeeksAtZero = self.WeeksAtZero + 1
                     self.decay_points(DaysElapsed)
                 else:
                     self.WeeksAtZero = 0
                     self.add_points(Event[2], DaysElapsed)
+            # "loot" event
             elif lower(Event[1]) == "loot":
                 NewDebugLine = NewDebugLine + ("%-20s [%-8s] " % (Event[3], Event[2]))
                 self.subtract_loot(Event[2])
+            # "bonus" event
             elif lower(Event[1]) == "bonus":
                 NewDebugLine = NewDebugLine + ("%-20s [%-8d] " % (Event[3], Event[2]))
                 self.bonus_points(Event[2], Event[3])
-            # store updated scores
-            #self.IncScores[Event[0]].append(self.Scores)
-            #print self.IncScores[Event[0]]
-            NewDebugLine = NewDebugLine + "["
-            for Score in self.Scores:
-                NewDebugLine = NewDebugLine + (" %3d" % Score)
-            NewDebugLine = NewDebugLine + " ]\n"
-            self.DebugReport = self.DebugReport + NewDebugLine
-            self.update_seniority()
+            NewDebugLine = self.debug_line_end(NewDebugLine)
+            self.inc_scores(Event[0],DaysElapsed,capwords(Event[1]),self.Scores)
+        # update seniority
+        self.update_seniority()
         return
 
+    def debug_line_start(self, Event, DaysElapsed):
+        NewDebugLine = ""
+        NewDebugLine = NewDebugLine + "[" + Event[0].strftime('%Y-%m-%d') + "] "
+        NewDebugLine = NewDebugLine + ("[%d] " % DaysElapsed)
+        NewDebugLine = NewDebugLine + "["
+        for Score in self.Scores:
+            NewDebugLine = NewDebugLine + (" %3d" % Score)
+        NewDebugLine = NewDebugLine + " ] "
+        return NewDebugLine
 
+    def debug_line_end(self, NewDebugLine):
+        NewDebugLine = NewDebugLine + "["
+        for Score in self.Scores:
+            NewDebugLine = NewDebugLine + (" %3d" % Score)
+        NewDebugLine = NewDebugLine + " ]\n"
+        self.DebugReport = self.DebugReport + NewDebugLine
+        return
+
+    def inc_scores(self, Date, DaysElapsed, Event, Scores):
+        tempIncScores = {}
+        tempIncScores["Date"] = Date
+        tempIncScores["DaysElapsed"] = DaysElapsed
+        tempIncScores["Event"] = Event
+        tempIncScores["Scores"] = Scores
+        self.IncScores.append(tempIncScores)
+        return
+                            
     def add_points(self, Participation, DaysElapsed):
         # determine points to add
         PointsAdded = self.PointsPerDay[Participation] * DaysElapsed
-        for index, OldScores in enumerate(self.Scores):
+        for index in self.Scores.keys():
             self.Scores[index] = self.Scores[index] + PointsAdded
         return
 
@@ -141,7 +158,7 @@ class GuildMember(object):
         PointsLost = self.PointDecay[self.WeeksAtZero] / 7.0 * DaysElapsed
 
         # make sure we don't decay past zero
-        for index, OldScore in enumerate(self.Scores):
+        for index in self.Scores.keys():
             if self.Scores[index] > 0 and self.Scores[index] - PointsLost > 0:
                 self.Scores[index] = self.Scores[index] - PointsLost
             elif self.Scores[index] > 0 and self.Scores[index] - PointsLost < 0:
@@ -151,40 +168,18 @@ class GuildMember(object):
         return
 
     def subtract_loot(self, LootValue):
-        if lower(LootValue) == "epic":
-            # reset epic, rare, uncommon, common
-            # subtract epic value from none
-            self.Scores[0] = self.reset_score(LootValue, self.Scores[0])
-            self.Scores[1] = self.reset_score(LootValue, self.Scores[1])
-            self.Scores[2] = self.reset_score(LootValue, self.Scores[2])
-            self.Scores[3] = self.reset_score(LootValue, self.Scores[3])
-        elif lower(LootValue) == "rare":
-            # reset rare, uncommon, common
-            # subtract epic value from epic
-            self.Scores[0] = self.Scores[0] - self.ValueCosts[lower(LootValue)]
-            self.Scores[1] = self.reset_score(LootValue, self.Scores[1])
-            self.Scores[2] = self.reset_score(LootValue, self.Scores[2])
-            self.Scores[3] = self.reset_score(LootValue, self.Scores[3])
-        elif lower(LootValue) == "uncommon":
-            # reset uncommon, common
-            # subtract epic value from epic, rare
-            self.Scores[0] = self.Scores[0] - self.ValueCosts[lower(LootValue)]
-            self.Scores[1] = self.Scores[1] - self.ValueCosts[lower(LootValue)]
-            self.Scores[2] = self.reset_score(LootValue, self.Scores[2])
-            self.Scores[3] = self.reset_score(LootValue, self.Scores[3])
-        elif lower(LootValue) == "zg":
-            # reset common
-            # subtract epic value from epic, rare, uncommon
-            self.Scores[0] = self.Scores[0] - self.ValueCosts[lower(LootValue)]
-            self.Scores[1] = self.Scores[1] - self.ValueCosts[lower(LootValue)]
-            self.Scores[2] = self.Scores[2] - self.ValueCosts[lower(LootValue)]
-            self.Scores[3] = self.reset_score(LootValue, self.Scores[3])
-        else:
-            print "you fucked up"
-            
-        return
+        # pull out the index for the loot value:
+        # reset equal and less valuable scores
+        # subtract from more valuable scores
+        LootValueIndex = self.ValueLabels[lower(LootValue)]
+        for index in self.Scores.keys():
+            if index >= LootValueIndex:
+                self.Scores[index] = self.reset_score(self.Scores[index])
+            else:
+                self.Scores[index] = self.Scores[index] - self.ValueCosts[LootValueIndex]
+        return                
 
-    def reset_score(self, LootValue, Score):
+    def reset_score(self, Score):
         # reset cost
         ResetCost = 0.75 * Score
         # chose which cost to use
@@ -197,7 +192,7 @@ class GuildMember(object):
         return NewScore
 
     def bonus_points(self, Bonus, Reason):
-        for index, OldScore in enumerate(self.Scores):
+        for index in self.Scores.keys():
             self.Scores[index] = self.Scores[index] + Bonus
         return
 
