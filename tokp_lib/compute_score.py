@@ -39,17 +39,17 @@ def test_stuff(Events):
         Sarkoris.ScanMemberEvents(MemberEvents)
     #print Sarkoris.Scores
     #print Sarkoris.IncScores
-    #print Sarkoris.SeniorityVec
-    #print Sarkoris.Seniority
-    #print Sarkoris.SeniorityLastMonth
-    print Sarkoris.DebugReport
+    print Sarkoris.SeniorityVec
+    print Sarkoris.Seniority
+    print Sarkoris.SeniorityLastMonth
+    #print Sarkoris.DebugReport
     return
 
 #--[ ComputeScore Class ]------------------------------------------------------
 class GuildMember(object):
     
     # defined by loot system rules:
-    PointsPerDay = {0.5 : 0.00, 1 : 0.40, 2: 0.80, 3: 1.60, 4 : 2.00}
+    PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
     PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
     ValueCosts = {"epic":20 , "rare":6, "uncommon":3, "zg":1}
     MinCost = 20
@@ -210,12 +210,8 @@ class GuildMember(object):
         return
 
     def update_seniority(self):
-        self.Seniority = 0
-        self.SeniorityLastMonth = 0
-        for i, Participation in enumerate(self.SeniorityVec):
-            self.Seniority = self.Seniority + Participation
-            if i >= len(self.SeniorityVec) - 4:
-                self.SeniorityLastMonth = self.SeniorityLastMonth + Participation
+        self.Seniority = sum(self.SeniorityVec)
+        self.SeniorityLastMonth = sum(self.SeniorityVec[len(self.SeniorityVec)-4:])
         return
 
 #------------------------------------------------------------------------------
