@@ -84,13 +84,14 @@ for week in RaidWeeks.keys():
             if Member not in WeekAttendance.keys():
                 WeekAttendance[Member] = 0
             WeekAttendance[Member] += float(1) / float(RaidWeeks[week].NumRaidsThisWeek)
-    # store the participation event for each member
+    # store the weekly participation event for each member
     for Member in Guild.keys():
         if Member in WeekAttendance.keys():
             Guild[Member].add_participation(RaidWeeks[week].AttendanceDate, WeekAttendance[Member])
         else:
             Guild[Member].add_participation(RaidWeeks[week].AttendanceDate, 0)
 
-
-print Guild
-
+# scan events for all guild members
+for Member in Guild.keys():
+    Guild[Member].ScanMemberEvents()
+##    print Guild[Member].Scores

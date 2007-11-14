@@ -37,7 +37,8 @@ def test_stuff(Events):
     for Member in Events.keys():
         MemberEvents = Events[Member]
         Sarkoris = GuildMember()
-        Sarkoris.ScanMemberEvents(MemberEvents)
+        Sarkoris.StoreMemberEvents(MemberEvents)
+        Sarkoris.ScanMemberEvents()
     #print Sarkoris.Scores
     #for IncScore in Sarkoris.IncScores:
     #    print IncScore
@@ -51,7 +52,7 @@ def test_stuff(Events):
 class GuildMember(object):
     
     # defined by loot system rules:
-    PartFactor = {0.5:0.10, 1:0.25, 2:0.5, 3:0.75, 4:1.00}
+    PartFactor = {0.5:0.00, 1:0.10, 2:0.25, 3:0.50, 4:0.75}
     PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
     PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
     ValueLabels = {"epic":1, "rare":2, "uncommon":3, "zg":4}
@@ -70,16 +71,18 @@ class GuildMember(object):
         self.DebugReport = ""
 
     def add_participation(self, attendance_date, attendance):
+        new_factor = 0
         for factor in self.PartFactor.keys():
-            if attendance < self.PartFactor[factor]:
+            if attendance > self.PartFactor[factor]:
+                new_factor = factor
+            else:
                 break
-            new_factor = factor
         NewEvent = (attendance_date, "Participation", new_factor)
         self.add_event(NewEvent)
 
     def add_event(self, NewEvent):
         self.MemberEvents.append(NewEvent)
-        self.MemberEvents(sort)
+        self.MemberEvents.sort()
 
     def del_event(self, DelEvent):
         self.MemberEvents.remove(DelEvent)
@@ -88,12 +91,14 @@ class GuildMember(object):
         if index < len(self.MemberEvents)-1:
             NextEvent = self.MemberEvents[index+1]
         else:
-            NextEvent = (datetime.date.today(), "End")
+            NextEvent = (datetime.date.today(), "Today")
         Delta = NextEvent[0] - Event[0]
         return Delta.days
 
-    def ScanMemberEvents(self, MemberEvents):
+    def StoreMemberEvents(self, MemberEvents):
         self.MemberEvents = MemberEvents
+
+    def ScanMemberEvents(self):
         self.WeeksAtZero = 0;
         NewScores = {}
 

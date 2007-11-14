@@ -45,7 +45,7 @@ class RaidWeek(object):
             year2 = int(match_obj.group('year2'))
             month2 = int(match_obj.group('month2'))
             day2 = int(match_obj.group('day2'))
-            self.AttendanceDate = datetime.datetime(year1, month1, day1)
+            self.AttendanceDate = datetime.date(year1, month1, day1)
             return 
         else:
             raise ValueError('Could not parse datetime string')
