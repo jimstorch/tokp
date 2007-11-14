@@ -34,12 +34,12 @@ rawstr = r"^(?P<year>\d{2,})-(?P<month>\d\d)-(?P<day>\d\d)\s(?P<hour>\d\d)" + \
     ":(?P<minute>\d\d):(?P<second>\d\d)\.(?P<micro>\d*)$"
 compile_obj = re.compile(rawstr)
 
-def str_to_dt(string):
+def str_to_dt(string_in):
 
     """Given a string in the format 'YYYY-MM-DD HH:MM:SS:MMMMMM,'
     returns a datetime object."""
     
-    match_obj = compile_obj.search(string)
+    match_obj = compile_obj.search(string_in)
     if match_obj:
         year = int(match_obj.group('year'))
         month = int(match_obj.group('month'))
@@ -117,17 +117,18 @@ def read_raid_xml(fname):
     
     """Given an XML file name, un-serializes it to a Raid object.
     Returns the Raid object."""
-    
+  
     tree = et.parse(open('data/raids/' + fname,'rU'))
     zone = tree.findtext('zone')
-    start_time = str_to_dt(tree.findtext('start_time'))
-    end_time = str_to_dt(tree.findtext('end_time'))
+    start_time_str = tree.findtext('start_time')
+    start_time = str_to_dt(start_time_str)
+    end_time_str = tree.findtext('end_time')
+    end_time = str_to_dt(end_time_str)
     raid = Raid(zone,start_time)
     raid.end_time = end_time 
     for elem in tree.getiterator('name'):
         raid.add_member(elem.text)
     return raid    
-
 
 #--[ Raid Files ]-------------------------------------------------------------- 
 

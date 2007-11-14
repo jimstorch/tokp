@@ -51,6 +51,7 @@ def test_stuff(Events):
 class GuildMember(object):
     
     # defined by loot system rules:
+    PartFactor = {0.5:0.10, 1:0.25, 2:0.5, 3:0.75, 4:1.00}
     PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
     PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
     ValueLabels = {"epic":1, "rare":2, "uncommon":3, "zg":4}
@@ -67,6 +68,21 @@ class GuildMember(object):
         self.Seniority = 0;
         self.SeniorityLastMonth = 0;
         self.DebugReport = ""
+
+    def add_participation(self, attendance_date, attendance):
+        for factor in self.PartFactor.keys():
+            if attendance < self.PartFactor[factor]:
+                break
+            new_factor = factor
+        NewEvent = (attendance_date, "Participation", new_factor)
+        self.add_event(NewEvent)
+
+    def add_event(self, NewEvent):
+        self.MemberEvents.append(NewEvent)
+        self.MemberEvents(sort)
+
+    def del_event(self, DelEvent):
+        self.MemberEvents.remove(DelEvent)
 
     def get_days_elapsed(self, index, Event):
         if index < len(self.MemberEvents)-1:
@@ -212,4 +228,5 @@ class GuildMember(object):
             NewDebugLine = NewDebugLine + " ]\n"
             self.DebugReport = self.DebugReport + NewDebugLine
 #------------------------------------------------------------------------------
-    
+
+

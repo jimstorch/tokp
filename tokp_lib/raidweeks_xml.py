@@ -8,8 +8,47 @@
 
 import datetime
 import os
+import re
 from xml.etree import cElementTree as et
 from xml_store import indent
+
+class RaidWeek(object):
+
+    def __init__(self):
+        self.NumRaidsThisWeek = 0
+        self.Raids = []
+        self.AttendanceDate = datetime.date(2000,1,1)
+    
+    def add_member(self, Raid):
+        self.Raids.append(Raid)
+        self.Raids.sort()
+        self.NumRaidsThisWeek += 1
+
+    def del_member(self, Raid):
+        self.Raids.remove(Raid)
+        self.NumRaidsThisWeek -= 1
+
+    def SetRaidWeek(self, str_raidweek):
+        """Given a string in the format 'YYYY-MM-DD YYYY-MM-DD',
+        update the class with the datetime object"""
+
+        ## Regex for SetRaidWeek()
+        rawstr = r"^(?P<year1>\d{2,})-(?P<month1>\d\d)-(?P<day1>\d\d)\s" + \
+                   "(?P<year2>\d{2,})-(?P<month2>\d\d)-(?P<day2>\d\d)$"
+        compile_obj = re.compile(rawstr)    
+
+        match_obj = compile_obj.search(str_raidweek)
+        if match_obj:
+            year1 = int(match_obj.group('year1'))
+            month1 = int(match_obj.group('month1'))
+            day1 = int(match_obj.group('day1'))
+            year2 = int(match_obj.group('year2'))
+            month2 = int(match_obj.group('month2'))
+            day2 = int(match_obj.group('day2'))
+            self.AttendanceDate = datetime.datetime(year1, month1, day1)
+            return 
+        else:
+            raise ValueError('Could not parse datetime string')
 
 #--[ RaidWeeksXML Class ]------------------------------------------------------
 class RaidWeeksXML(object):
