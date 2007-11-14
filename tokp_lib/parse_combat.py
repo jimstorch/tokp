@@ -2,7 +2,6 @@
 #   File:       parse_combat.py
 #   Purpose:    
 #   Author:     Jim Storch
-#   Revised:
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
@@ -11,32 +10,59 @@ import re
 from tokp_lib.timestamp_event import timestamp_event
 from tokp_lib.zones import get_mob_dict
 
-#--[ Regular Expressions to extract names from battle spam ]-------------------
 
-# ' fades from '
-fades_str = r"^.+\sfades\sfrom\s(?P<name>.+)\."
-fades_obj = re.compile(fades_str)
-# ' gains '
-gains_str = r"^(?P<name>.+)\s\gains\s"
-gains_obj = re.compile(gains_str)
-# 'its '  (matches hits or crits)
-hits_str = r"^(?P<name>.[^']+\b).*\s(?:h|cr)its\s"
-hits_obj = re.compile(hits_str)
-# ' suffers '
-suffers_str = r"^(?P<name>.+)\ssuffers\s"
-suffers_obj = re.compile(suffers_str)
-# ' heals '
-heals_str = r"^(?P<name>.[^']+\b).*\sheals\s"
-heals_obj = re.compile(heals_str)
-# ' is afflicted '
-afflicted_str = r"^(?P<name>.+)\sis\safflicted\s"
-afflicted_obj = re.compile(afflicted_str)
+#--[ Guess Class ]-------------------------------------------------------------
+
+## Sark, I rewrote your is_class() function to this.  I moved the list juggling
+## outside the function so it will only run once when the module is loaded.
+## The funky looking [ stuff ] inside spell_list.extend() is called a 
+## list comprehension.
+
+rogue_spells = ['Anesthetic Poison','Ambush','Feint','Backstab', 
+    'Sinister Strike']
+mage_spells = ['Arcane Blast','Arcane Missiles','Fireball hits','Scorch hits',
+    'Fireblast']
+pet_spells = ['Feed Pet Effect','Feed Pet Effect','Kill Command','Mend Pet']
+spell_list = []
+spell_list.extend( [(spell,'rogue') for spell in rogue_spells] )
+spell_list.extend( [(spell,'mage') for spell in mage_spells] )
+spell_list.extend( [(spell,'pet') for spell in pet_spells] )
+
+def guess_class(event):
+
+    """Attempts to determine the class of the current event's subject.
+    Returns None if it cannot tell."""
+
+    guess = None
+    for spell,caster in spell_list:
+        if spell in event:
+            guess = caster
+            break
+    return guess
 
 
 #--[ Find Name ]---------------------------------------------------------------
 
+## Regexes to extract names
+## The notation "[^']+\b" is needed to handle possessive apostrophes that had
+## a space pre-pended by the SW-STATS mod, e.g. "Tom 's heroic strike ...".
+fades_str = r"^.+\sfades\sfrom\s(?P<name>.+)\."
+fades_obj = re.compile(fades_str)               # fades
+gains_str = r"^(?P<name>.+)\s\gains\s"
+gains_obj = re.compile(gains_str)               # gains
+hits_str = r"^(?P<name>.[^']+\b).*\s(?:h|cr)its\s"
+hits_obj = re.compile(hits_str)                 # hits or crits
+suffers_str = r"^(?P<name>.+)\ssuffers\s"
+suffers_obj = re.compile(suffers_str)           # suffers
+heals_str = r"^(?P<name>.[^']+\b).*\sheals\s"
+heals_obj = re.compile(heals_str)               # heals
+afflicted_str = r"^(?P<name>.+)\sis\safflicted\s"
+afflicted_obj = re.compile(afflicted_str)       # afflicts
+
 def find_name(event):
-    ## Given an event text, attempts to extract a meaningful name
+
+    """Given an event text, attempts to extract a meaningful name."""
+    
     name = None
 
     if ' fades from ' in event:
@@ -65,19 +91,6 @@ def find_name(event):
             name = match_obj.group('name') 
     return name
 
-# determine which class the current line contains
-def is_class(line):
-    rogue_spells = set(['Anesthetic Poison','Ambush','Feint','Backstab','Sinister Strike'])
-    mage_spells = set(['Arcane Blast','Arcane Missiles','Fireball hits','Scorch hits','Fireblast'])
-    pet_spells = set(['Feed Pet Effect','Feed Pet Effect','Kill Command','Mend Pet'])
-
-    class_spells = {'rogue':rogue_spells, 'mage':mage_spells, 'pet':pet_spells}
-    for cur_class, cur_spells in class_spells.iteritems():
-        for cur_spell in cur_spells:
-            if cur_spell in line:
-                return cur_class
-    
-    return 0
 
 #--[ Raid Class ]--------------------------------------------------------------
 
@@ -90,20 +103,23 @@ class Raid(object):
         self.last_pulse = start_time
         self.end_time = None
 
-    def add_member(self, name, timestamp):
+    def add_member(self, name):
         if name not in self.raid_members:
             self.raid_members.append(name)
-            print "[%s] Add %s at %s." % ( self.zone, name, 
-                timestamp.strftime('%H:%M.%S'))
+            #print "[%s] Add %s." % (self.zone,name)
 
     def pulse(self, timestamp):
-        ## updates time when we last saw a unique zone mob.
+
+        """Updates time when we last saw a unique zone mob."""
+
         self.last_pulse = timestamp
 
     def decay_time(self,timestamp):
-        ## given a timestamp, returns the number of seconds since
-        ## we last saw a unique zone mob.
-        td = timestamp - self.last_pulse
+    
+        """Given a timestamp, returns the number of seconds since
+        we last saw a unique zone mob."""
+
+        td = timestamp - self.last_pulse        
         return td.seconds
 
 
@@ -147,7 +163,7 @@ def parse_combat(parse_from, parse_to, combat_log, roster, you):
                             zone,timestamp.strftime('%H:%M:%S'))
                         current_raid = Raid(zone,timestamp)
                         ## Always add the log's creator
-                        current_raid.add_member(you,timestamp)
+                        current_raid.add_member(you)
                         raid_list.append(current_raid)
                         
                     ## have we moved zones?       
@@ -159,7 +175,7 @@ def parse_combat(parse_from, parse_to, combat_log, roster, you):
                         ## start a new raid
                         current_raid = Raid(zone,timestamp)
                         # Always add the log's creator
-                        current_raid.add_member(you,timestamp)
+                        current_raid.add_member(you)
                         raid_list.append(current_raid)
                         
                     else:
@@ -169,7 +185,7 @@ def parse_combat(parse_from, parse_to, combat_log, roster, you):
                 ## or is it a guildie?    
                 elif name in roster:
                     if current_raid:
-                        current_raid.add_member(name,timestamp)
+                        current_raid.add_member(name)
 
             ## Test for raid decay.
             if current_raid:

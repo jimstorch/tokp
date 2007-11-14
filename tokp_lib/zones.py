@@ -9,17 +9,17 @@
 import glob
 import re
 
+
+#--[ Get Mod Dict ]------------------------------------------------------------
+
+## Regex for get_mob_dict()
 mobstr = r'.*[/\\](?P<zone>.+)\.mobs'
 mob_obj = re.compile(mobstr)
 
-lootstr = r'.*[/\\](?P<zone>.+)\.loot'
-loot_obj = re.compile(lootstr)
-
-
-# Find all *.mobs files and make a dictionary matching the filename (zone)
-# to the mob name. 
-
 def get_mob_dict():
+
+    """Find all *.mobs files and make a dictionary matching the filename
+    (zone) to the mob name.""" 
 
     mob_dict = {}
     mob_files = glob.glob('zones/*.mobs')
@@ -42,9 +42,15 @@ def get_mob_dict():
     return mob_dict     
 
 
-# Find all *.loot files and build a master list of items we care about.
+#--[ Get Loot Dict ]-----------------------------------------------------------
+
+## Regex for get_loot_dict()
+lootstr = r'.*[/\\](?P<zone>.+)\.loot'
+loot_obj = re.compile(lootstr)
 
 def get_loot_dict():
+
+    """Find all *.loot files and build a master list of items we care about."""
 
     loot_dict={}
     loot_files = glob.glob('zones/*.loot')

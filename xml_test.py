@@ -7,15 +7,17 @@
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
+"""
+This script creates 12 random raids with 20 random guild members each.
+The first raid is on Oct 1, 2007 and the next 11 occur randomly spaced
+three to six days apart.
+"""
+
 import datetime
 import random
 
 from tokp_lib.parse_combat import Raid 
-from tokp_lib.xml_store import write_raid_xml
-
-timestamp = datetime.datetime.now()
-ten_minutes = datetime.timedelta(minutes=10)
-
+from tokp_lib.xml_store import write_raid_xml, read_raid_xml, raid_files
 
 zones = ['Mines of Moria','Mordor','Minas Morgul','Dennys']
 
@@ -26,14 +28,22 @@ guild = ['Everard', 'Sam', 'Sauron', 'Boromir', 'Galadriel',
     'Maggot', 'Gimli', 'Gollum', 'Isildur','Arwen',
     'Barliman', 'Elrond', 'Frodo', 'Larry', 'Curly']
 
-zone = random.choice(zones)
-raid = Raid(zone, timestamp)
-## make a raid of 20 random members
-while len(raid.raid_members) < 20:
-    timestamp += ten_minutes
-    raid.add_member(random.choice(guild), timestamp)
 
-raid.end_time = timestamp + ten_minutes
+one_day = datetime.timedelta(days=1)
+three_hours = datetime.timedelta(minutes=180)
 
-write_raid_xml(raid)    
+raid_night = datetime.datetime(2007,10,1,19,0,0)
 
+for x in range(12):
+    zone = random.choice(zones)
+    raid = Raid(zone, raid_night)
+    ## make a raid of 20 random members
+    while len(raid.raid_members) < 20:
+        raid.add_member(random.choice(guild))
+    raid.end_time = raid_night + three_hours
+    write_raid_xml(raid)
+    raid_night += one_day * random.randrange(3,7)
+
+#read_raid_xml(fname)
+#flist = raid_files()
+#print flist
