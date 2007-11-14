@@ -12,7 +12,8 @@ import sys
 import os
 from optparse import OptionParser
 
-from tokp_lib.raidweeks_xml import update_raidweeks
+from tokp_lib.raidweeks_xml import RaidWeeksXML
+#from tokp_lib.raidweeks_xml import raidweek_output
 from tokp_lib.datetime_range import datetime_range
 from tokp_lib.roster import get_roster
 from tokp_lib.parse_combat import parse_combat
@@ -70,11 +71,13 @@ raids = parse_combat(parse_from, parse_to, options.combatlog, roster,
 ## Parse the chat log looking for loots    
 loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
 
+## Update the raidweeks.xml
+RaidWeeks = RaidWeeksXML()
+RaidWeeks.UpdateRaidWeeks(options, parse_from)
+
 ## Create the summary file
 write_summary(options, parse_from, raids, loots)
 
-## Update the raidweeks.xml
-update_raidweeks(options, parse_from)
 
 t2 = time.time()
 print "[complete] Process time was %f seconds." % (t2 - t1) 

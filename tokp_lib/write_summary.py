@@ -9,7 +9,7 @@
 import os
 import datetime
 
-from tokp_lib.raidweeks_xml import raidweek_output
+from raidweeks_xml import raidweek_output
 
 
 

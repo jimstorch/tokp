@@ -15,7 +15,7 @@ from xml_store import indent
 class RaidWeeksXML(object):
 
     def __init__(self):
-        self.XMLFile = r"..\data\raids\raidweeks.xml"
+        self.XMLFile = r"data\raids\raidweeks.xml"
         self.RaidWeeks = []
 
     ## Get the text out of a nodelist
@@ -81,17 +81,17 @@ class RaidWeeksXML(object):
 
 
     ## Update the raidweeks to include the week corresponding to the current raid
-    def UpdateRaidweeks(self, options, raid_date):
+    def UpdateRaidWeeks(self, options, raid_date):
 
         # load the raidweeks
-        vec_raidweeks = self.load_raidweeks()
-
+        self.LoadRaidWeeks()
+        
         # form current raidweek
-        str_raidweek = self.raidweek_output(options.raidweek_start, raid_date)
-
+        str_raidweek = raidweek_output(options.raidweek_start, raid_date)
+                
         # check for existence of the current raidweek in the list
         # insert the current raidweek if necessary
-        if not str_raidweek in vec_raidweeks:
+        if not str_raidweek in self.RaidWeeks:
             vec_raidweeks.append(str_raidweek)
             vec_raidweeks.sort()
 
@@ -99,30 +99,6 @@ class RaidWeeksXML(object):
         self.save_raidweeks()
 
         return 
-
-    ## Define a string for the raid week corresponding to the selected date
-    def raidweek_output(self, raidweek_start, raid_date):
-        
-        raid_day = raid_date.isoweekday()
-        week_start = datetime.date
-        week_end = datetime.date
-
-        # pull out dates of start and end of the week
-        if raid_day <= raidweek_start:
-            temp1 = datetime.timedelta(raidweek_start-raid_day-7)
-            temp2 = datetime.timedelta(raidweek_start-raid_day)
-            week_start = raid_date + temp1
-            week_end = raid_date + temp2
-        else:
-            temp1 = datetime.timedelta(raidweek_start-raid_day)
-            temp2 = datetime.timedelta(raidweek_start-raid_day+7)
-            week_start = raid_date + temp1
-            week_end = raid_date + temp2
-
-        # form the string for the raidweek
-        str_raidweek = week_start.strftime('%Y-%m-%d') + " " + week_end.strftime('%Y-%m-%d')
-
-        return str_raidweek
 
     ## Jim's implementation
     def raidweek2(timestamp):
@@ -135,3 +111,27 @@ class RaidWeeksXML(object):
             end_date.strftime('%y-%m-%d'))
         return dir_name
 #------------------------------------------------------------------------------
+
+## Define a string for the raid week corresponding to the selected date
+def raidweek_output(raidweek_start, raid_date):
+    
+    raid_day = raid_date.isoweekday()
+    week_start = datetime.date
+    week_end = datetime.date
+
+    # pull out dates of start and end of the week
+    if raid_day <= raidweek_start:
+        temp1 = datetime.timedelta(raidweek_start-raid_day-7)
+        temp2 = datetime.timedelta(raidweek_start-raid_day)
+        week_start = raid_date + temp1
+        week_end = raid_date + temp2
+    else:
+        temp1 = datetime.timedelta(raidweek_start-raid_day)
+        temp2 = datetime.timedelta(raidweek_start-raid_day+7)
+        week_start = raid_date + temp1
+        week_end = raid_date + temp2
+
+    # form the string for the raidweek
+    str_raidweek = week_start.strftime('%Y-%m-%d') + " " + week_end.strftime('%Y-%m-%d')
+
+    return str_raidweek
