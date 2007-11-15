@@ -55,11 +55,11 @@ def str_to_dt(string_in):
 
 
 #--[ Indent ]------------------------------------------------------------------
-# From http://effbot.org/zone/element-lib.htm (plus Paul Du Bois comment)
+# From http://effbot.org/zone/element-lib.htm (plus Paul Du Bois's comment)
 
 def indent(elem, level=0):
 
-    """Make an elementree all nice and pretty with indents and line breaks."""
+    """Make an ElementTree all nice and pretty with indents and line breaks."""
 
     i = "\n" + level * "    "
     if len(elem):

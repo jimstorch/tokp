@@ -13,20 +13,15 @@ from tokp_lib.zones import get_mob_dict
 
 #--[ Guess Class ]-------------------------------------------------------------
 
-## Sark, I rewrote your is_class() function to this.  I moved the list juggling
-## outside the function so it will only run once when the module is loaded.
-## The funky looking [ stuff ] inside spell_list.extend() is called a 
-## list comprehension.
-
 rogue_spells = ['Anesthetic Poison','Ambush','Feint','Backstab', 
     'Sinister Strike']
 mage_spells = ['Arcane Blast','Arcane Missiles','Fireball hits','Scorch hits',
     'Fireblast']
 pet_spells = ['Feed Pet Effect','Feed Pet Effect','Kill Command','Mend Pet']
-spell_list = []
-spell_list.extend( [(spell,'rogue') for spell in rogue_spells] )
-spell_list.extend( [(spell,'mage') for spell in mage_spells] )
-spell_list.extend( [(spell,'pet') for spell in pet_spells] )
+
+spell_list = list((spell,'rogue') for spell in rogue_spells)
+spell_list.extend((spell,'mage') for spell in mage_spells)
+spell_list.extend((spell,'pet') for spell in pet_spells)
 
 def guess_class(event):
 
