@@ -61,6 +61,7 @@ class GuildMember(object):
     MaxCost = 50
 
     def __init__(self):
+        self.Name = ""
         self.MemberEvents = []
         self.Scores = {1:0.00, 2:0.00, 3:0.00, 4:0.00}
         self.IncScores = []
@@ -69,6 +70,7 @@ class GuildMember(object):
         self.Seniority = 0;
         self.SeniorityLastMonth = 0;
         self.DebugReport = ""
+        self.LootByPerson = ""
 
     def add_participation(self, attendance_date, attendance):
         new_factor = 0
@@ -232,6 +234,24 @@ class GuildMember(object):
                 NewDebugLine = NewDebugLine + (" %3d" % NewScores[index])
             NewDebugLine = NewDebugLine + " ]\n"
             self.DebugReport = self.DebugReport + NewDebugLine
+        return
+
+    def update_lootbyperson(self):
+        EventDate = datetime.date(1,1,2000)
+        for Event in self.MemberEvent
+            if lower(Event[1]) == "loot"
+                if EventDate == Event[0]
+                    str_EventDate = ("%10s " % "")
+                else
+                    str_EventDate = EventDate.strftime('%Y-%m-%d')
+                EventDate = Event[0]
+                self.LootByPerson += ("%11s " % "")
+                self.LootByPerson += str_EventDate
+                self.LootByPerson += ("%40s " % Event[3])
+                self.LootByPerson += ("%8s " % Event[2])
+                self.LootByPerson += "\n"
+        return
+    
 #------------------------------------------------------------------------------
 
 
