@@ -14,10 +14,11 @@ from xml_store import indent
 
 class RaidWeek(object):
 
-    def __init__(self):
+    def __init__(self, str_raidweek):
         self.NumRaidsThisWeek = 0
         self.Raids = []
         self.AttendanceDate = datetime.date(2000,1,1)
+        self.set_raid_week(str_raidweek)
     
     def add_member(self, Raid):
         self.Raids.append(Raid)
@@ -28,7 +29,7 @@ class RaidWeek(object):
         self.Raids.remove(Raid)
         self.NumRaidsThisWeek -= 1
 
-    def SetRaidWeek(self, str_raidweek):
+    def set_raid_week(self, str_raidweek):
         """Given a string in the format 'YYYY-MM-DD YYYY-MM-DD',
         update the class with the datetime object"""
 

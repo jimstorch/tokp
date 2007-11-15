@@ -36,10 +36,10 @@ RaidWeeks = {}
 for index in AllRaids.keys():
     str_raidweek = raidweek_output(RaidWeekStart, AllRaids[index].start_time)
     if str_raidweek not in RaidWeeks.keys():
-        RaidWeeks[str_raidweek] = RaidWeek()
-        RaidWeeks[str_raidweek].SetRaidWeek(str_raidweek)
+        RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
     RaidWeeks[str_raidweek].add_member(AllRaids[index])
-    # can add loot to the Guild dictionary here!    
+    # can add loot to the Guild dictionary here!
+    
 
 # compute participation in each week
 Attendance = []
