@@ -36,7 +36,7 @@ def test_stuff(Events):
     # loop through members
     for Member in Events.keys():
         MemberEvents = Events[Member]
-        Sarkoris = GuildMember()
+        Sarkoris = GuildMember(Member)
         Sarkoris.StoreMemberEvents(MemberEvents)
         Sarkoris.ScanMemberEvents()
     #print Sarkoris.Scores
@@ -60,8 +60,8 @@ class GuildMember(object):
     MinCost = 20
     MaxCost = 50
 
-    def __init__(self):
-        self.Name = ""
+    def __init__(self, Name):
+        self.Name = Name
         self.MemberEvents = []
         self.Scores = {1:0.00, 2:0.00, 3:0.00, 4:0.00}
         self.IncScores = []
@@ -135,6 +135,7 @@ class GuildMember(object):
         # update seniority
         self.update_seniority()
         self.update_debug()
+        self.update_lootbyperson()
         return
 
     def add_points(self, Participation, DaysElapsed):
@@ -237,15 +238,21 @@ class GuildMember(object):
         return
 
     def update_lootbyperson(self):
-        EventDate = datetime.date(1,1,2000)
-        for Event in self.MemberEvent
-            if lower(Event[1]) == "loot"
-                if EventDate == Event[0]
+        EventDate = datetime.date(2000,01,01)
+        first_loot = 1
+        for Event in self.MemberEvents:
+            if lower(Event[1]) == "loot":
+                if first_loot:
+                    str_Name = ("%11s " % self.Name)
+                    first_loot = 0
+                else:
+                    str_Name = ("%11s " % "")
+                if EventDate == Event[0]:
                     str_EventDate = ("%10s " % "")
-                else
+                else:
                     str_EventDate = EventDate.strftime('%Y-%m-%d')
                 EventDate = Event[0]
-                self.LootByPerson += ("%11s " % "")
+                self.LootByPerson += str_Name
                 self.LootByPerson += str_EventDate
                 self.LootByPerson += ("%40s " % Event[3])
                 self.LootByPerson += ("%8s " % Event[2])
