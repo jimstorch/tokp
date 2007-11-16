@@ -33,7 +33,7 @@ guild = ['Everard', 'Sam', 'Sauron', 'Boromir', 'Galadriel',
 one_day = datetime.timedelta(days=1)
 three_hours = datetime.timedelta(minutes=180)
 
-raid_night = datetime.datetime(2007,10,1,19,0,0)
+raid_night = datetime.datetime(2007,9,1,19,0,0)
 
 for x in range(12):
     zone = random.choice(zones)

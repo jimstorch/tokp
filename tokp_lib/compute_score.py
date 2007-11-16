@@ -10,45 +10,117 @@ import datetime
 import string
 from string import lower
 from string import capwords
+from tokp_lib.raidweeks_xml import RaidWeek, raidweek_output
 
-test0 = (datetime.date(2007,10,9), "Add Member")
-test1 = (datetime.date(2007,10,9), "Participation", 4)
-test2 = (datetime.date(2007,10,16), "Participation", 4)
-test3 = (datetime.date(2007,10,23), "Participation", 4)
-test4 = (datetime.date(2007,10,30), "Participation", 0)
-test5 = (datetime.date(2007,11,1), "Bonus", 10, "a very good reason")
-test6 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
-test7 = (datetime.date(2007,11,2), "lOOT", "ZG", "Epic Pants of Crap")
-test8 = (datetime.date(2007,11,6), "Participation", 0)
+##test0 = (datetime.date(2007,10,9), "Add Member")
+##test1 = (datetime.date(2007,10,9), "Participation", 4)
+##test2 = (datetime.date(2007,10,16), "Participation", 4)
+##test3 = (datetime.date(2007,10,23), "Participation", 4)
+##test4 = (datetime.date(2007,10,30), "Participation", 0)
+##test5 = (datetime.date(2007,11,1), "Bonus", 10, "a very good reason")
+##test6 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
+##test7 = (datetime.date(2007,11,2), "lOOT", "ZG", "Epic Pants of Crap")
+##test8 = (datetime.date(2007,11,6), "Participation", 0)
+##
+##test9 = (datetime.date(2007,10,9), "Participation", 4)
+##test10 = (datetime.date(2007,10,16), "Participation", 4)
+##test11 = (datetime.date(2007,10,23), "Participation", 4)
+##test12 = (datetime.date(2007,10,30), "Participation", 0)
+##test13 = (datetime.date(2007,11,6), "Participation", 0.5)
+##Events = {"Sarkoris" : [test0, test1, test2, test3, test4, test5, test6, test7, test8],
+##          "Lias": [test0, test9, test10, test11, test12, test13]}
+##
+##def test_stuff(Events):
+##    Scores = {}
+##    IncScores = ()
+##    Seniority = {}
+##    # loop through members
+##    for Member in Events.keys():
+##        MemberEvents = Events[Member]
+##        Sarkoris = GuildMember(Member)
+##        Sarkoris.StoreMemberEvents(MemberEvents)
+##        Sarkoris.ScanMemberEvents()
+##    #print Sarkoris.Scores
+##    #for IncScore in Sarkoris.IncScores:
+##    #    print IncScore
+##    #print Sarkoris.SeniorityVec
+##    #print Sarkoris.Seniority
+##    #print Sarkoris.SeniorityLastMonth
+##    print Sarkoris.DebugReport
+##    return
 
-test9 = (datetime.date(2007,10,9), "Participation", 4)
-test10 = (datetime.date(2007,10,16), "Participation", 4)
-test11 = (datetime.date(2007,10,23), "Participation", 4)
-test12 = (datetime.date(2007,10,30), "Participation", 0)
-test13 = (datetime.date(2007,11,6), "Participation", 0.5)
-Events = {"Sarkoris" : [test0, test1, test2, test3, test4, test5, test6, test7, test8],
-          "Lias": [test0, test9, test10, test11, test12, test13]}
+#--[ Guild Class ]-------------------------------------------------------------
+class Guild(object):
 
-def test_stuff(Events):
-    Scores = {}
-    IncScores = ()
-    Seniority = {}
-    # loop through members
-    for Member in Events.keys():
-        MemberEvents = Events[Member]
-        Sarkoris = GuildMember(Member)
-        Sarkoris.StoreMemberEvents(MemberEvents)
-        Sarkoris.ScanMemberEvents()
-    #print Sarkoris.Scores
-    #for IncScore in Sarkoris.IncScores:
-    #    print IncScore
-    #print Sarkoris.SeniorityVec
-    #print Sarkoris.Seniority
-    #print Sarkoris.SeniorityLastMonth
-    print Sarkoris.DebugReport
-    return
+    def __init__(self):
+        self.MemberList = {}
+        self.DebugReport = ""
+        self.LootByPerson = ""
+        self.LootByDate = ""
+        self.LootByBoss = ""
 
-#--[ ComputeScore Class ]------------------------------------------------------
+    def add_member(self, Member):
+        self.MemberList[Member] = GuildMember(Member)
+        return
+
+    def del_member(self, Member):
+        self.MemberList.remove(Member.Name)
+        return
+
+    def parse_attendance(self, RaidWeeks):
+        # compute participation in each week
+        Attendance = []
+        for Week in RaidWeeks.keys():
+            WeekAttendance = {}
+            for CurRaid in RaidWeeks[Week].Raids:
+                for Member in CurRaid.raid_members:
+                    if Member not in self.MemberList.keys():
+                        self.add_member(Member)
+                    if Member not in WeekAttendance.keys():
+                        WeekAttendance[Member] = 0
+                    WeekAttendance[Member] += float(1) / float(RaidWeeks[Week].NumRaidsThisWeek)
+            # store the weekly participation event for each member
+            for Member in self.MemberList.keys():
+                if Member in WeekAttendance.keys():
+                    self.MemberList[Member].add_participation(RaidWeeks[Week].AttendanceDate, WeekAttendance[Member])
+                else:
+                    self.MemberList[Member].add_participation(RaidWeeks[Week].AttendanceDate, 0)
+        return
+
+    def parse_loot(self, LootList):
+        return
+
+    def UpdateReports(self):
+        TempDebugReport = ""
+        TempLootByPerson = ""
+        for Member in self.MemberList.keys():
+            self.MemberList[Member].ScanMemberEvents()
+            TempDebugReport += ("%s\n%s\n" % (self.MemberList[Member].Name, self.MemberList[Member].DebugReport))
+            TempLootByPerson += ("%s\n" % self.MemberList[Member].LootByPerson)
+        self.update_debug(TempDebugReport)
+        self.update_lootbyperson(TempLootByPerson)
+
+    def update_debug(self, TempDebugReport):
+        self.DebugReport += ("Last updated: %s\n\n" % (datetime.date.today().strftime('%Y-%m-%d')))
+        self.DebugReport += TempDebugReport
+
+        DebugReport = open('debug.txt','w')
+        DebugReport.write(self.DebugReport)
+        DebugReport.close()
+        return
+
+    def update_lootbyperson(self, TempLootByPerson):
+        self.LootByPerson += ("Last updated: %s\n\n" % (datetime.date.today().strftime('%Y-%m-%d')))
+        self.LootByPerson += 'Date       Mob               Item                               Value    $$$  Person      \n'
+        self.LootByPerson += '------------------------------------------------------------------------------------------\n'
+        self.LootByPerson += TempLootByPerson
+
+        LootByPerson = open('lootbyperson.txt','w')
+        LootByPerson.write(self.LootByPerson)
+        LootByPerson.close()
+        return
+
+#--[ GuildMember Class ]-------------------------------------------------------
 class GuildMember(object):
     
     # defined by loot system rules:
@@ -60,8 +132,8 @@ class GuildMember(object):
     MinCost = 20
     MaxCost = 50
 
-    def __init__(self, Name):
-        self.Name = Name
+    def __init__(self, str_Name):
+        self.Name = str_Name
         self.MemberEvents = []
         self.Scores = {1:0.00, 2:0.00, 3:0.00, 4:0.00}
         self.IncScores = []
@@ -90,11 +162,16 @@ class GuildMember(object):
         self.MemberEvents.remove(DelEvent)
 
     def get_days_elapsed(self, index, Event):
-        if index < len(self.MemberEvents)-1:
-            NextEvent = self.MemberEvents[index+1]
+##        if index < len(self.MemberEvents)-1:
+##            NextEvent = self.MemberEvents[index+1]
+##        else:
+##            NextEvent = (datetime.date.today(), "Today")
+##        Delta = NextEvent[0] - Event[0]
+        if index == 0:
+            PrevEvent = self.MemberEvents[0]
         else:
-            NextEvent = (datetime.date.today(), "Today")
-        Delta = NextEvent[0] - Event[0]
+            PrevEvent = self.MemberEvents[index-1]
+        Delta = Event[0] - PrevEvent[0]
         return Delta.days
 
     def StoreMemberEvents(self, MemberEvents):
@@ -216,25 +293,22 @@ class GuildMember(object):
             DaysElapsed = self.IncDaysElapsed[index]
         
             NewDebugLine = ""
-            NewDebugLine = NewDebugLine + "[" + Event[0].strftime('%Y-%m-%d') + "] "
-            NewDebugLine = NewDebugLine + ("[%d] " % DaysElapsed)
-            NewDebugLine = NewDebugLine + "["
-            for index in OldScores.keys():
-                NewDebugLine = NewDebugLine + (" %3d" % OldScores[index])
-            NewDebugLine = NewDebugLine + " ] "
+            NewDebugLine += ("[%s] [%2d] " % (Event[0].strftime('%Y-%m-%d'), DaysElapsed))
+            NewDebugLine += ("[%3.0f %3.0f %3.0f] " % (OldScores[1], OldScores[2], OldScores[3]))
             if lower(Event[1]) == "add member":
                  NewDebugLine = NewDebugLine + ("%-20s [%-8s] " % (Event[1], ""))
             elif lower(Event[1]) == "participation":
-                NewDebugLine = NewDebugLine + ("%-20s [%-8d] " % (Event[1], Event[2]))
+                NewDebugLine += ("%-20s [%-8d] " % (Event[1], Event[2]))
             elif lower(Event[1]) == "loot":
-                NewDebugLine = NewDebugLine + ("%-20s [%-8s] " % (Event[3], Event[2]))
+                NewDebugLine += ("%-20s [%-8s] " % (Event[3], Event[2]))
             elif lower(Event[1]) == "bonus":
-                NewDebugLine = NewDebugLine + ("%-20s [%-8d] " % (Event[3], Event[2]))
-            NewDebugLine = NewDebugLine + "["
-            for index in NewScores.keys():
-                NewDebugLine = NewDebugLine + (" %3d" % NewScores[index])
-            NewDebugLine = NewDebugLine + " ]\n"
-            self.DebugReport = self.DebugReport + NewDebugLine
+                NewDebugLine += ("%-20s [%-8d] " % (Event[3], Event[2]))
+            NewDebugLine += ("[%3.0f %3.0f %3.0f]\n" % (NewScores[1], NewScores[2], NewScores[3]))
+            self.DebugReport += NewDebugLine
+        NewDebugLine = ""
+        NewDebugLine += ("[%s] [%2d] " % (datetime.date.today().strftime('%Y-%m-%d'), DaysElapsed))
+        NewDebugLine += ("[%3.0f %3.0f %3.0f] Today\n" % (NewScores[1], NewScores[2], NewScores[3]))
+        self.DebugReport += NewDebugLine
         return
 
     def update_lootbyperson(self):
