@@ -7,47 +7,9 @@
 #------------------------------------------------------------------------------
 
 import datetime
-import string
-from string import lower
-from string import capwords
+from string import capwords, lower
 from tokp_lib.raidweeks_xml import RaidWeek, raidweek_output
-
-##test0 = (datetime.date(2007,10,9), "Add Member")
-##test1 = (datetime.date(2007,10,9), "Participation", 4)
-##test2 = (datetime.date(2007,10,16), "Participation", 4)
-##test3 = (datetime.date(2007,10,23), "Participation", 4)
-##test4 = (datetime.date(2007,10,30), "Participation", 0)
-##test5 = (datetime.date(2007,11,1), "Bonus", 10, "a very good reason")
-##test6 = (datetime.date(2007,11,2), "Loot", "Rare", "Epic Helm of Crap")
-##test7 = (datetime.date(2007,11,2), "lOOT", "ZG", "Epic Pants of Crap")
-##test8 = (datetime.date(2007,11,6), "Participation", 0)
-##
-##test9 = (datetime.date(2007,10,9), "Participation", 4)
-##test10 = (datetime.date(2007,10,16), "Participation", 4)
-##test11 = (datetime.date(2007,10,23), "Participation", 4)
-##test12 = (datetime.date(2007,10,30), "Participation", 0)
-##test13 = (datetime.date(2007,11,6), "Participation", 0.5)
-##Events = {"Sarkoris" : [test0, test1, test2, test3, test4, test5, test6, test7, test8],
-##          "Lias": [test0, test9, test10, test11, test12, test13]}
-##
-##def test_stuff(Events):
-##    Scores = {}
-##    IncScores = ()
-##    Seniority = {}
-##    # loop through members
-##    for Member in Events.keys():
-##        MemberEvents = Events[Member]
-##        Sarkoris = GuildMember(Member)
-##        Sarkoris.StoreMemberEvents(MemberEvents)
-##        Sarkoris.ScanMemberEvents()
-##    #print Sarkoris.Scores
-##    #for IncScore in Sarkoris.IncScores:
-##    #    print IncScore
-##    #print Sarkoris.SeniorityVec
-##    #print Sarkoris.Seniority
-##    #print Sarkoris.SeniorityLastMonth
-##    print Sarkoris.DebugReport
-##    return
+import tokp_lib.system_rules as Rules
 
 #--[ Guild Class ]-------------------------------------------------------------
 class Guild(object):
@@ -122,15 +84,6 @@ class Guild(object):
 
 #--[ GuildMember Class ]-------------------------------------------------------
 class GuildMember(object):
-    
-    # defined by loot system rules:
-    PartFactor = {0.5:0.00, 1:0.10, 2:0.25, 3:0.50, 4:0.75}
-    PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
-    PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
-    ValueLabels = {"epic":1, "rare":2, "uncommon":3, "zg":4}
-    ValueCosts = {1:20 , 2:6, 3:3, 4:1}
-    MinCost = 20
-    MaxCost = 50
 
     def __init__(self, str_Name):
         self.Name = str_Name
@@ -146,8 +99,8 @@ class GuildMember(object):
 
     def add_participation(self, attendance_date, attendance):
         new_factor = 0
-        for factor in self.PartFactor.keys():
-            if attendance > self.PartFactor[factor]:
+        for factor in Rules.PartFactor.keys():
+            if attendance > Rules.PartFactor[factor]:
                 new_factor = factor
             else:
                 break
@@ -205,7 +158,7 @@ class GuildMember(object):
                 NewScores = self.subtract_loot(Event[2])
             # "bonus" event
             elif lower(Event[1]) == "bonus":
-                NewScores = self.bonus_points(Event[2], Event[3])
+                NewScores = self.bonus_points(Event[2])
 
             self.IncScores.append(NewScores)
             self.Scores = NewScores
@@ -218,7 +171,7 @@ class GuildMember(object):
     def add_points(self, Participation, DaysElapsed):
         NewScores = {}
         # determine points to add
-        PointsAdded = self.PointsPerDay[Participation] * DaysElapsed
+        PointsAdded = Rules.PointsPerDay[Participation] * DaysElapsed
         for index in self.Scores.keys():
             NewScores[index] = self.Scores[index] + PointsAdded
         return NewScores
@@ -231,7 +184,7 @@ class GuildMember(object):
             self.WeeksAtZero = 5
 
         # find points lost based on weeks inactive
-        PointsLost = self.PointDecay[self.WeeksAtZero] / 7.0 * DaysElapsed
+        PointsLost = Rules.PointDecay[self.WeeksAtZero] / 7.0 * DaysElapsed
 
         # make sure we don't decay past zero
         for index in self.Scores.keys():
@@ -258,17 +211,17 @@ class GuildMember(object):
 
     def reset_score(self, Score):
         # reset cost
-        ResetCost = 0.75 * Score
+        ResetCost = Rules.ResetPercent * Score
         # chose which cost to use
-        if ResetCost < self.MinCost:
-            NewScore = Score - self.MinCost
-        elif ResetCost > self.MaxCost:
-            NewScore = Score - self.MaxCost
+        if ResetCost < Rules.MinCost:
+            NewScore = Score - Rules.MinCost
+        elif ResetCost > Rules.MaxCost:
+            NewScore = Score - Rules.MaxCost
         else:
             NewScore = Score - ResetCost
         return NewScore
 
-    def bonus_points(self, Bonus, Reason):
+    def bonus_points(self, Bonus):
         NewScores = {}
         for index in self.Scores.keys():
             NewScores[index] = self.Scores[index] + Bonus
