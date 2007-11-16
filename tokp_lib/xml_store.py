@@ -48,10 +48,9 @@ def str_to_dt(string_in):
         minute = int(match_obj.group('minute'))
         second = int(match_obj.group('second'))
         micro = int(match_obj.group('micro'))
-        return datetime.datetime(year, month, day, hour, minute, second, micro)
-    
     else:
         raise ValueError('Could not parse datetime string')    
+    return datetime.datetime(year, month, day, hour, minute, second, micro)
 
 
 #--[ Indent ]------------------------------------------------------------------
@@ -103,8 +102,8 @@ def write_raid_xml(raid):
         name.text = member
     ## Make pretty and write to a file
     indent(xml)
-    f = open('data/raids/' + fname,'w')
-    f.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
+    f = open('data/raids/' + fname,'wU')
+    f.write('<?xml version="1.0"?>\n')
     tree = et.ElementTree(xml)
     tree.write(f, 'utf-8')
     #print et.tostring(xml)
