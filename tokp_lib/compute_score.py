@@ -16,10 +16,20 @@ class Guild(object):
 
     def __init__(self):
         self.MemberList = {}
+        self.RaidWeeks = {}
         self.DebugReport = ""
         self.LootByPerson = ""
         self.LootByDate = ""
         self.LootByBoss = ""
+
+    def parse_all_raids(self, AllRaids, AllLoot):
+        # sort all raids and loots into raidweek buckets
+        for index in AllRaids.keys():
+            str_raidweek = raidweek_output(Rules.RaidWeekStart, AllRaids[index].start_time)
+            if str_raidweek not in self.RaidWeeks.keys():
+               self.RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
+            self.RaidWeeks[str_raidweek].add_member(AllRaids[index])
+        return
 
     def add_member(self, Member):
         self.MemberList[Member] = GuildMember(Member)
@@ -29,24 +39,24 @@ class Guild(object):
         self.MemberList.remove(Member.Name)
         return
 
-    def parse_attendance(self, RaidWeeks):
+    def compute_attendance(self):
         # compute participation in each week
         Attendance = []
-        for Week in RaidWeeks.keys():
+        for Week in self.RaidWeeks.keys():
             WeekAttendance = {}
-            for CurRaid in RaidWeeks[Week].Raids:
+            for CurRaid in self.RaidWeeks[Week].Raids:
                 for Member in CurRaid.raid_members:
                     if Member not in self.MemberList.keys():
                         self.add_member(Member)
                     if Member not in WeekAttendance.keys():
                         WeekAttendance[Member] = 0
-                    WeekAttendance[Member] += float(1) / float(RaidWeeks[Week].NumRaidsThisWeek)
+                    WeekAttendance[Member] += float(1) / float(self.RaidWeeks[Week].NumRaidsThisWeek)
             # store the weekly participation event for each member
             for Member in self.MemberList.keys():
                 if Member in WeekAttendance.keys():
-                    self.MemberList[Member].add_participation(RaidWeeks[Week].AttendanceDate, WeekAttendance[Member])
+                    self.MemberList[Member].add_participation(self.RaidWeeks[Week].AttendanceDate, WeekAttendance[Member])
                 else:
-                    self.MemberList[Member].add_participation(RaidWeeks[Week].AttendanceDate, 0)
+                    self.MemberList[Member].add_participation(self.RaidWeeks[Week].AttendanceDate, 0)
         return
 
     def parse_loot(self, LootList):

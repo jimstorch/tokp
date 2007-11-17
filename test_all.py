@@ -21,7 +21,7 @@ for fname in file_list:
     if not fname == "raidweeks":
         AllRaids[fname] = read_raid_xml(fname+'.xml')
 #print AllRaids
-    
+AllLoot = {}
 # scan the raid dictionary:
 # create dictionary of guild members
 # update guild as new members found
@@ -29,45 +29,10 @@ for fname in file_list:
 
 # define the guild
 ToK = Guild()
-RaidWeekStart = 2
-RaidWeeks = {}
-
-# sort the raids into raidweek buckets
-for index in AllRaids.keys():
-    str_raidweek = raidweek_output(RaidWeekStart, AllRaids[index].start_time)
-    if str_raidweek not in RaidWeeks.keys():
-        RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
-    RaidWeeks[str_raidweek].add_member(AllRaids[index])
-    # can add loot to the Guild dictionary here!
-    
-ToK.parse_attendance(RaidWeeks)
+# enter all raids and loots into the guild history
+ToK.parse_all_raids(AllRaids, AllLoot)
+# compute attendance at every raidweek
+ToK.compute_attendance()
+# update reports for output
 ToK.UpdateReports()
 
-### compute participation in each week
-##Attendance = []
-##for week in RaidWeeks.keys():
-##    WeekAttendance = {}
-##    for CurRaid in RaidWeeks[week].Raids:
-##        for Member in CurRaid.raid_members:
-##            if Member not in Guild.keys():
-##                Guild[Member] = GuildMember(Member)
-##            if Member not in WeekAttendance.keys():
-##                WeekAttendance[Member] = 0
-##            WeekAttendance[Member] += float(1) / float(RaidWeeks[week].NumRaidsThisWeek)
-##    # store the weekly participation event for each member
-##    for Member in Guild.keys():
-##        if Member in WeekAttendance.keys():
-##            Guild[Member].add_participation(RaidWeeks[week].AttendanceDate, WeekAttendance[Member])
-##        else:
-##            Guild[Member].add_participation(RaidWeeks[week].AttendanceDate, 0)
-
-# scan events for all guild members
-##DebugReport
-##for Member in Guild.keys():
-##    Guild[Member].ScanMemberEvents()
-
-
-
-##print Guild["Celeborn"].Name
-##print Guild["Celeborn"].Scores
-##print Guild["Celeborn"].IncScores

@@ -8,6 +8,7 @@
 
 
 # defined by loot system rules:
+RaidWeekStart = 2
 PartFactor = {0.5:0.00, 1:0.10, 2:0.25, 3:0.50, 4:0.75}
 PointsPerDay = {0.5:0.00, 1:0.82, 2:1.29, 3:1.68, 4:2.00}
 PointDecay = {0:0.0, 1:0.0, 2:2.0, 3:4.0, 4:8.0, 5:10.0}
