@@ -8,6 +8,8 @@
 
 import datetime
 from string import capwords, lower
+
+from tokp_lib.xml_store import read_raid_xml, raid_files
 from tokp_lib.raidweeks_xml import RaidWeek, raidweek_output
 import tokp_lib.system_rules as Rules
 
@@ -17,12 +19,21 @@ class Guild(object):
     def __init__(self):
         self.MemberList = {}
         self.RaidWeeks = {}
+        self.AllRaids = {}
+        self.AllLoots = {}
         self.DebugReport = ""
         self.LootByPerson = ""
         self.LootByDate = ""
         self.LootByBoss = ""
 
-    def parse_all_raids(self, AllRaids, AllLoot):
+    def LoadRaids(self):
+        file_list = raid_files()
+        for fname in file_list:
+            if not fname == "raidweeks":
+            AllRaids[fname] = read_raid_xml(fname+'.xml')
+        self.parse_all_raids()
+
+    def parse_all_raids(self):
         # sort all raids and loots into raidweek buckets
         for index in AllRaids.keys():
             str_raidweek = raidweek_output(Rules.RaidWeekStart, AllRaids[index].start_time)
@@ -39,7 +50,7 @@ class Guild(object):
         self.MemberList.remove(Member.Name)
         return
 
-    def compute_attendance(self):
+    def ComputeAttendance(self):
         # compute participation in each week
         Attendance = []
         for Week in self.RaidWeeks.keys():
