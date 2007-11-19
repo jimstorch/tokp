@@ -30,16 +30,16 @@ class Guild(object):
         file_list = raid_files()
         for fname in file_list:
             if not fname == "raidweeks":
-            AllRaids[fname] = read_raid_xml(fname+'.xml')
+                self.AllRaids[fname] = read_raid_xml(fname+'.xml')
         self.parse_all_raids()
 
     def parse_all_raids(self):
         # sort all raids and loots into raidweek buckets
-        for index in AllRaids.keys():
-            str_raidweek = raidweek_output(Rules.RaidWeekStart, AllRaids[index].start_time)
+        for index in self.AllRaids.keys():
+            str_raidweek = raidweek_output(Rules.RaidWeekStart, self.AllRaids[index].start_time)
             if str_raidweek not in self.RaidWeeks.keys():
                self.RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
-            self.RaidWeeks[str_raidweek].add_member(AllRaids[index])
+            self.RaidWeeks[str_raidweek].add_member(self.AllRaids[index])
         return
 
     def add_member(self, Member):
