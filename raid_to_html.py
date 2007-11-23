@@ -29,16 +29,21 @@ for rfile in rfiles:
     if folder not in file_list.keys():
         file_list[folder] = []
     file_list[folder].append(fname)
+    
 
-# Create an html file from the file list
-html = ''
-html += '<html>\n<body>\n'
+# Create html files from the folder list
+week_html = '<html>\n<body>\n'
 for folder in file_list.keys():
-    html += '<a href=../data/raids/%s/%s.raid>' % (folder, fname)
-    html += '%s: %s</a>\n' % (folder, fname)
-    html += '<br>\n'
-html += '</body>\n</html>\n'
-filename = 'data/raids/html_test.html'
-output = open(filename,'w')
-output.write(html)
-output.close()
+    week_html += '<a href="data/raids/%s/raidlist.html">%s</a><br>\n' % (folder, folder)
+    raid_html = '<html>\n<body>\n'
+    for fname in file_list[folder]:
+        raid_html += '<a href="%s.raid">%s</a>\n<br>\n' % (fname, fname)
+    raid_html += '</body>\n</html>\n'
+    filename = 'data/raids/%s/raidlist.html' % (folder)
+    raid_list = open(filename,'w')
+    raid_list.write(raid_html)
+    raid_list.close()
+week_html += '</body>\n</html>\n'
+week_list = open('weeklist.html','w')
+week_list.write(week_html)
+week_list.close()
