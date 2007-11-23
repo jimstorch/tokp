@@ -21,7 +21,7 @@ fname_obj = re.compile(fname_str)
 
 # Create a list of matching *.raid files in the raid folders
 file_list = {}
-rfiles = glob.glob('data/raids/*/*.raid')
+rfiles = glob.glob('raids/*/*.raid')
 for rfile in rfiles:
     match_obj = fname_obj.search(rfile)
     folder = match_obj.group('folder')
@@ -29,17 +29,20 @@ for rfile in rfiles:
     if folder not in file_list.keys():
         file_list[folder] = []
     file_list[folder].append(fname)
-    
+
+# Make a sorted list of folders
+folder_list = dict.fromkeys(file_list).keys()
+folder_list.sort()
 
 # Create html files from the folder list
 week_html = '<html>\n<body>\n'
-for folder in file_list.keys():
-    week_html += '<a href="data/raids/%s/raidlist.html">%s</a><br>\n' % (folder, folder)
+for folder in folder_list:
+    week_html += '<a href="raids/%s/raidlist.html">%s</a><br>\n' % (folder, folder)
     raid_html = '<html>\n<body>\n'
     for fname in file_list[folder]:
         raid_html += '<a href="%s.raid">%s</a>\n<br>\n' % (fname, fname)
     raid_html += '</body>\n</html>\n'
-    filename = 'data/raids/%s/raidlist.html' % (folder)
+    filename = 'raids/%s/raidlist.html' % (folder)
     raid_list = open(filename,'w')
     raid_list.write(raid_html)
     raid_list.close()
