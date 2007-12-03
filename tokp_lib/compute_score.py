@@ -25,6 +25,7 @@ class Guild(object):
         self.LootByPerson = ""
         self.LootByDate = ""
         self.LootByBoss = ""
+        return
 
     def LoadRaids(self):
         file_list = raid_files()
@@ -32,6 +33,7 @@ class Guild(object):
             if not fname == "raidweeks":
                 self.AllRaids[fname] = read_raid_xml(fname+'.xml')
         self.parse_all_raids()
+        return
 
     def parse_all_raids(self):
         # sort all raids and loots into raidweek buckets
@@ -117,6 +119,7 @@ class GuildMember(object):
         self.SeniorityLastMonth = 0;
         self.DebugReport = ""
         self.LootByPerson = ""
+        return
 
     def add_participation(self, attendance_date, attendance):
         new_factor = 0
@@ -127,13 +130,16 @@ class GuildMember(object):
                 break
         NewEvent = (attendance_date, "Participation", new_factor)
         self.add_event(NewEvent)
+        return
 
     def add_event(self, NewEvent):
         self.MemberEvents.append(NewEvent)
         self.MemberEvents.sort()
+        return
 
     def del_event(self, DelEvent):
         self.MemberEvents.remove(DelEvent)
+        return
 
     def get_days_elapsed(self, index, Event):
 ##        if index < len(self.MemberEvents)-1:
@@ -150,6 +156,7 @@ class GuildMember(object):
 
     def StoreMemberEvents(self, MemberEvents):
         self.MemberEvents = MemberEvents
+        return
 
     def ScanMemberEvents(self):
         self.WeeksAtZero = 0;
