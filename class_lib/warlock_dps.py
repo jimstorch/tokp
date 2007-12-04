@@ -25,7 +25,8 @@ class Warlock(object):
         
         self.Spec = WarlockSpecs()['Empty']
 
-        self.DoT_Priority = {1:'CoA',2:'Corruption',3:'UA',4:'Immolate'}
+##        self.DoT_Priority = {1:'CoA',2:'Corruption',3:'UA',4:'Immolate'}
+        self.DoT_Priority = {1:'CoA',2:'Corruption',3:'UA'}
         self.DoT = WarlockDoT()
 
         self.DoT_Priority = {1:'SB'}
@@ -108,6 +109,7 @@ class Warlock(object):
     
 #--[ Warlock Class ]-----------------------------------------------------------
 
-##def TestCombat():
-Lavode = Warlock()
-Lavode.SetCommonSpec('FGDR')
+def TestCombat():
+    Lavode = Warlock()
+    Lavode.SetCommonSpec('FGDR')
+
