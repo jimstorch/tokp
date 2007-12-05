@@ -9,6 +9,8 @@
 def WarlockSpecs():
     ## Define the empty spec
     EmptySpec = {'ImpCoA':0,
+                 'AmpCurse':0,
+                 'Nightfall':0,
                  'EmpCor':0,
                  'SiphonLife':0,
                  'ShadowMastery':0,
@@ -30,9 +32,61 @@ def WarlockSpecs():
                  'SnF':0,
                  }
 
+    ## Define the Unstable Affliction / Destructive Reach spec
+    UADRSpec = {'ImpCoA':2,
+                'AmpCurse':1,
+                'Nightfall':1,
+                 'EmpCor':3,
+                 'SiphonLife':1,
+                 'ShadowMastery':5,
+                 'Contagion':5,
+                 'UA':1,
+                 'DemonicAeg':0,
+                 'UnholyPow':0,
+                 'SucSac':0,
+                 'MasterD':0,
+                 'SoulLink':0,
+                 'DemonicKno':0,
+                 'DemonicTac':0,
+                 'Felguard':0,
+                 'ISB':1,
+                 'Bane':5,
+                 'Deva':5,
+                 'Ruin':0,
+                 'BackLash':0,
+                 'SnF':0,
+                 }
+
+    ## Define the Dark Pact / Ruin spec
+    DPRSpec = {'ImpCoA':2,
+               'AmpCurse':1,
+               'Nightfall':1,
+                 'EmpCor':3,
+                 'SiphonLife':1,
+                 'ShadowMastery':5,
+                 'Contagion':5,
+                 'UA':0,
+                 'DemonicAeg':0,
+                 'UnholyPow':0,
+                 'SucSac':0,
+                 'MasterD':0,
+                 'SoulLink':0,
+                 'DemonicKno':0,
+                 'DemonicTac':0,
+                 'Felguard':0,
+                 'ISB':1,
+                 'Bane':5,
+                 'Deva':5,
+                 'Ruin':1,
+                 'BackLash':0,
+                 'SnF':0,
+                 }
+
     ## Define the felguard / destructive reach spec
     FGDRSpec = {'ImpCoA':0,
                  'EmpCor':0,
+                'AmpCurse':0,
+                'Nightfall':0,
                  'SiphonLife':0,
                  'ShadowMastery':0,
                  'Contagion':0,
@@ -53,7 +107,7 @@ def WarlockSpecs():
                  'SnF':0,
                  }
 
-    ## Define the 
+    ## Define the Demonic Tactics / Ruin spec
     DTRSpec = {'ImpCoA':0,
                  'EmpCor':0,
                  'SiphonLife':0,
@@ -77,13 +131,18 @@ def WarlockSpecs():
                  }
 
     ## Collect common Warlock specs
-    WarlockSpecs = {'Empty':EmptySpec, 'FGDR':FGDRSpec, 'DTR':DTRSpec}
+    WarlockSpecs = {'Empty':EmptySpec,
+                    'FGDR':FGDRSpec,
+                    'UADR':UADRSpec,
+                    'DTR':DTRSpec,
+                    'DPR':DPRSpec}
     return WarlockSpecs
 
 def WarlockDoT():
 
     ## Curse of Agony
-    CoA = {'BaseDamage':1356,
+    CoA = {'Name':'Curse of Agony',
+           'BaseDamage':1356,
            'Duration':24,
            'Ticks':12,
            'DmgPerc':1.20,
@@ -91,7 +150,8 @@ def WarlockDoT():
            }
 
     ## Curse of Doom
-    CoD = {'BaseDamage':4200,
+    CoD = {'Name':'Curse of Doom',
+           'BaseDamage':4200,
            'Duration':60,
            'Ticks':1,
            'DmgPerc':2.00,
@@ -99,7 +159,8 @@ def WarlockDoT():
            }
 
     ## Corruption
-    Cor = {'BaseDamage':906,
+    Cor = {'Name':'Corruption',
+           'BaseDamage':906,
            'Duration':18,
            'Ticks':6,
            'DmgPerc':0.93,
@@ -107,7 +168,8 @@ def WarlockDoT():
            }
 
     ## Siphon Life
-    SL =  {'BaseDamage':630,
+    SL =  {'Name':'Siphon Life',
+           'BaseDamage':630,
            'Duration':30,
            'Ticks':10,
            'DmgPerc':1.00,
@@ -115,7 +177,8 @@ def WarlockDoT():
            }
     
     ## Unstable Affliction
-    UA =  {'BaseDamage':1050,
+    UA =  {'Name':'Unstable Affliction',
+           'BaseDamage':1050,
            'Duration':18,
            'Ticks':6,
            'DmgPerc':1.20,
@@ -127,13 +190,23 @@ def WarlockDoT():
 
 def WarlockNuke():
 
-    SB = {'BaseDamage':600,
+    SB = {'Name':'Shadow Bolt',
+          'BaseDamage':mean(541,603),
           'BaseCast':3,
           'DmgPerc':0.8571,
           'Shadow':1,
           }
 
+    Inc = {'Name':'Incinerate',
+           'BaseDamage':mean(444,514),
+           'BaseCast':2.5,
+           'DmgPerc':0.8571,
+           'Shadow':0,
+           }
+
     WarlockNuke = {'SB':SB}
     return WarlockNuke
 
 
+def mean(x,y):
+    return (x+y)/2
