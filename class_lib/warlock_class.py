@@ -10,6 +10,8 @@ from warlock_lib import WarlockSpecs
 from warlock_lib import WarlockDoT
 from warlock_lib import WarlockNuke
 
+GCD = 1.5;
+
 #--[ Warlock Class ]-----------------------------------------------------------
 class Warlock(object):
 
@@ -68,8 +70,16 @@ class Warlock(object):
             CurDoT['Damage'] *= (1 + CurDoT['Shadow'] * self.Spec['SucSac'] * 0.15)
             CurDoT['Damage'] *= (1 + self.Spec['SoulLink'] * 0.05)
 
+            ## Deal with cast time
+            if CurDoT['Name'] == 'Corruption':
+                CurDoT['Cast'] = CurDoT['BaseCast'] - (self.Spec['ImpCor'] * 0.4)
+            else:
+                CurDoT['Cast'] = CurDoT['BaseCast']
+            if CurDoT['Cast'] < GCD
+                CurDoT['Cast'] = GCD
+
             ## Update current DoT damage per second and damage per tick
-            CurDoT['DPS'] = CurDoT['Damage'] / CurDoT['Duration']
+            CurDoT['DPS'] = CurDoT['Damage'] / (CurDoT['Duration'] + CurDoT['Cast'])
             CurDoT['DPT'] = CurDoT['Damage'] / CurDoT['Ticks']
 
             ## Store the current DoT
@@ -104,6 +114,8 @@ class Warlock(object):
                 CurNuke['Cast'] = CurNuke['BaseCast'] - (self.Spec['Bane'] * 0.1)
             else:
                 CurNuke['Cast'] = CurNuke['BaseCast']
+            if CurNuke['Cast'] < GCD
+                CurNuke['Cast'] = GCD
                                                          
             ## Update current DoT damage per second
             CurNuke['DPS'] = CurNuke['TotalDamage'] / CurNuke['Cast']

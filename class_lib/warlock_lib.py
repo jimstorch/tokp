@@ -8,7 +8,8 @@
 
 def WarlockSpecs():
     ## Define the empty spec
-    EmptySpec = {'ImpCoA':0,
+    EmptySpec = {'ImpCor':0,
+                 'ImpCoA':0,
                  'AmpCurse':0,
                  'Nightfall':0,
                  'EmpCor':0,
@@ -33,7 +34,8 @@ def WarlockSpecs():
                  }
 
     ## Define the Unstable Affliction / Destructive Reach spec
-    UADRSpec = {'ImpCoA':2,
+    UADRSpec = {'ImpCor':5,
+                'ImpCoA':2,
                 'AmpCurse':1,
                 'Nightfall':1,
                  'EmpCor':3,
@@ -58,7 +60,8 @@ def WarlockSpecs():
                  }
 
     ## Define the Dark Pact / Ruin spec
-    DPRSpec = {'ImpCoA':2,
+    DPRSpec = {'ImpCor':5,
+               'ImpCoA':2,
                'AmpCurse':1,
                'Nightfall':1,
                  'EmpCor':3,
@@ -83,8 +86,9 @@ def WarlockSpecs():
                  }
 
     ## Define the felguard / destructive reach spec
-    FGDRSpec = {'ImpCoA':0,
-                 'EmpCor':0,
+    FGDRSpec = {'ImpCor':0,
+                'ImpCoA':0,
+                'EmpCor':0,
                 'AmpCurse':0,
                 'Nightfall':0,
                  'SiphonLife':0,
@@ -108,7 +112,8 @@ def WarlockSpecs():
                  }
 
     ## Define the Demonic Tactics / Ruin spec
-    DTRSpec = {'ImpCoA':0,
+    DTRSpec = {'ImpCor':0,
+               'ImpCoA':0,
                  'EmpCor':0,
                  'SiphonLife':0,
                  'ShadowMastery':0,
@@ -143,6 +148,7 @@ def WarlockDoT():
     ## Curse of Agony
     CoA = {'Name':'Curse of Agony',
            'BaseDamage':1356,
+           'BaseCast':0,
            'Duration':24,
            'Ticks':12,
            'DmgPerc':1.20,
@@ -152,6 +158,7 @@ def WarlockDoT():
     ## Curse of Doom
     CoD = {'Name':'Curse of Doom',
            'BaseDamage':4200,
+           'BaseCast':0,
            'Duration':60,
            'Ticks':1,
            'DmgPerc':2.00,
@@ -161,6 +168,7 @@ def WarlockDoT():
     ## Corruption
     Cor = {'Name':'Corruption',
            'BaseDamage':906,
+           'BaseCast':2,
            'Duration':18,
            'Ticks':6,
            'DmgPerc':0.93,
@@ -170,6 +178,7 @@ def WarlockDoT():
     ## Siphon Life
     SL =  {'Name':'Siphon Life',
            'BaseDamage':630,
+           'BaseCast':0,
            'Duration':30,
            'Ticks':10,
            'DmgPerc':1.00,
@@ -179,6 +188,7 @@ def WarlockDoT():
     ## Unstable Affliction
     UA =  {'Name':'Unstable Affliction',
            'BaseDamage':1050,
+           'BaseCast':1.5,
            'Duration':18,
            'Ticks':6,
            'DmgPerc':1.20,
