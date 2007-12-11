@@ -152,6 +152,7 @@ def WarlockDoT():
            'Duration':24,
            'Ticks':12,
            'DmgPerc':1.20,
+           'Mana':265,
            'Shadow':1,
            }
 
@@ -162,6 +163,7 @@ def WarlockDoT():
            'Duration':60,
            'Ticks':1,
            'DmgPerc':2.00,
+           'Mana':380,
            'Shadow':1,
            }
 
@@ -172,6 +174,7 @@ def WarlockDoT():
            'Duration':18,
            'Ticks':6,
            'DmgPerc':0.93,
+           'Mana':370,
            'Shadow':1,
            }
 
@@ -182,6 +185,7 @@ def WarlockDoT():
            'Duration':30,
            'Ticks':10,
            'DmgPerc':1.00,
+           'Mana':410,
            'Shadow':1,
            }
     
@@ -192,6 +196,7 @@ def WarlockDoT():
            'Duration':18,
            'Ticks':6,
            'DmgPerc':1.20,
+           'Mana':400,
            'Shadow':1,
            }
 
@@ -204,6 +209,7 @@ def WarlockNuke():
           'BaseDamage':mean(541,603),
           'BaseCast':3,
           'DmgPerc':0.8571,
+          'Mana':420,
           'Shadow':1,
           }
 
@@ -211,6 +217,7 @@ def WarlockNuke():
            'BaseDamage':mean(444,514),
            'BaseCast':2.5,
            'DmgPerc':0.8571,
+           'Mana':355,
            'Shadow':0,
            }
 

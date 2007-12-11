@@ -75,7 +75,7 @@ class Warlock(object):
                 CurDoT['Cast'] = CurDoT['BaseCast'] - (self.Spec['ImpCor'] * 0.4)
             else:
                 CurDoT['Cast'] = CurDoT['BaseCast']
-            if CurDoT['Cast'] < GCD
+            if CurDoT['Cast'] < GCD:
                 CurDoT['Cast'] = GCD
 
             ## Update current DoT damage per second and damage per tick
@@ -114,7 +114,7 @@ class Warlock(object):
                 CurNuke['Cast'] = CurNuke['BaseCast'] - (self.Spec['Bane'] * 0.1)
             else:
                 CurNuke['Cast'] = CurNuke['BaseCast']
-            if CurNuke['Cast'] < GCD
+            if CurNuke['Cast'] < GCD:
                 CurNuke['Cast'] = GCD
                                                          
             ## Update current DoT damage per second
