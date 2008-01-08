@@ -93,7 +93,7 @@ class ArmoryCharacter(object):
         # Quick hack to display certain attributes of certain elements.
         strAttributes = (('character', 'level'),
                          ('character', 'guildName'),
-                         ('baseStats', 'agility'))
+                         ('agility', 'effective'))
          
         for strElement, strAttribute in strAttributes:
             oElement = oDoc.getElementsByTagName(strElement)[0]
