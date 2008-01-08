@@ -33,7 +33,7 @@ class ArmoryCharacter(object):
         else:
             self.strBaseURL = 'http://www.wowarmory.com/'
         self.read_character_tab()
-        self.read_talen_tab()
+        self.read_talent_tab()
         return
 
     def read_character_tab(self):
@@ -90,18 +90,33 @@ class ArmoryCharacter(object):
         # Use xml dom to parse the file
         oDoc = xml.dom.minidom.parseString(self.strCharFile)
          
-        # Quick hack to display certain attributes of certain elements.
-        strAttributes = (('character', 'level'),
-                         ('character', 'guildName'),
-                         ('agility', 'effective'))
-         
-        for strElement, strAttribute in strAttributes:
-            oElement = oDoc.getElementsByTagName(strElement)[0]
-            strValue = oElement.getAttribute(strAttribute)
-            print strElement, strAttribute, strValue
-
+        # Pull out base and effective stats
+        strBaseStats = (('strength', 'base'),
+                        ('agility', 'base'),
+                        ('stamina', 'base'),
+                        ('intellect', 'base'),
+                        ('spirit', 'base'),
+                        ('armor', 'base'))
+        strTotalStats = (('strength', 'effective'),
+                         ('agility', 'effective'),
+                         ('stamina', 'effective'),
+                         ('intellect', 'effective'),
+                         ('spirit', 'effective'),
+                         ('armor', 'effective'))
+        strAllStats = (('BaseStats', strBaseStats),
+                       ('TotalStats', strTotalStats))
+        self.Stats = {}
+        for strStatName, strCurStat in strAllStats:
+            strElementValue = {}
+            for strElement, strAttribute in strCurStat:
+                oElement = oDoc.getElementsByTagName(strElement)[0]
+                strValue = oElement.getAttribute(strAttribute)
+                strElementValue[strElement] = int(strValue)
+            self.Stats[strStatName] = strElementValue
+##        print self.Stats
         return
 
     def parse_talent_file(self):
         # Now have raw xml file, can print it if interested
-        print self.strTalentFile
+##        print self.strTalentFile
+        return
