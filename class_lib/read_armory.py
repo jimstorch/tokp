@@ -106,12 +106,10 @@ class ArmoryCharacter(object):
         strTalentSpec = (('talentSpec', 'treeOne'),
                          ('talentSpec', 'treeTwo'),
                          ('talentSpec', 'treeThree'))
-        strCharStats = (('TalentSpec', strTalentSpec),)
-        self.read_xml_chunk(CharDoc, strCharStats, 1)
-##        self.TalentSpec = (self.Stats['treeOne'],
-##                           self.Stats['treeTwo'],
-##                           self.Stats['treeThree'])
-##        self.Stats['TalentSpec'] = self.TalentSpec
+        self.TalentSpec = (self.read_xml_snippet(CharDoc, strTalentSpec[0], 1),
+                           self.read_xml_snippet(CharDoc, strTalentSpec[1], 1),
+                           self.read_xml_snippet(CharDoc, strTalentSpec[2], 1))
+        self.Stats['TalentSpec'] = self.TalentSpec
 
         # Pull out base stats and effective stats (integer values)
         strBaseStats = (('strength', 'base'),
@@ -145,21 +143,25 @@ class ArmoryCharacter(object):
         self.read_xml_chunk(TalentDoc, strTalentStats, 0)
         return
 
+    def read_xml_snippet(self, CurDoc, strStats, IsIntValue):
+        strElement, strAttribute = strStats
+        DocElement = CurDoc.getElementsByTagName(strElement)[0]
+        strValue = DocElement.getAttribute(strAttribute)
+        if IsIntValue:
+            curValue = int(strValue)
+        else:
+            curValue = str(strValue)
+        return curValue
+
     def read_xml_chunk(self, CurDoc, strStats, IsIntValue):
-        Stats = {}
         for strStatName, strCurStat in strStats:
             strElementValue = {}
             for strElement, strAttribute in strCurStat:
-                DocElement = CurDoc.getElementsByTagName(strElement)[0]
-                strValue = DocElement.getAttribute(strAttribute)
-                if IsIntValue:
-                    curValue = int(strValue)
-                else:
-                    curValue = str(strValue)
+                curValue = self.read_xml_snippet(CurDoc,(strElement,strAttribute),IsIntValue)
                 strElementValue[strElement] = curValue
             if (len(strElementValue) > 1):
                 self.Stats[strStatName] = strElementValue
             else:
                 self.Stats[strStatName] = curValue
-        return Stats
+        return
 #------------------------------------------------------------------------------
