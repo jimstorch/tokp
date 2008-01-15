@@ -6,6 +6,7 @@
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
+import urllib
 import urllib2
 import xml.dom.minidom
 
@@ -42,6 +43,25 @@ class ArmoryCharacter(object):
         self.parse_char_file()
         self.parse_talent_file()
         return
+
+    def open_url(self, strURL):
+        user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'
+        strHeaders = {'User-Agent':user_agent}
+        values = {}
+        strData = urllib.urlencode(values)
+        request = urllib2.Request(strURL,strData,strHeaders)
+        response = urllib2.urlopen(request)
+        strXMLFile = response.read()
+
+##        oOpener = urllib2.build_opener()
+##        oOpener.addheaders = [
+##           ('user-agent',
+##            'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'),
+##           ]
+##        req = urllib2.Request(strURL)
+##        strXMLFile = oOpener.open(req).read()
+        
+        return strXMLFile
     
     def read_character_tab(self):
         # Look the data up in the armory
@@ -50,17 +70,7 @@ class ArmoryCharacter(object):
                                      strCharURL,
                                      self.strRealm.replace(' ', '+'),
                                      self.strCharacter)
-
-        # Open url.
-        # Need to specify firefox as user agent as this makes the server
-        # return an XML file. If this is not done we get html.
-        oOpener = urllib2.build_opener()
-        oOpener.addheaders = [
-           ('user-agent',
-            'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'),
-           ]
-        req = urllib2.Request(strURL)
-        self.strCharFile = oOpener.open(req).read()
+        self.strCharFile = self.open_url(strURL)
         return
 
     def read_talent_tab(self):
@@ -69,18 +79,8 @@ class ArmoryCharacter(object):
         strURL = '%s%s?r=%s&n=%s' % (self.strBaseURL,
                                      strTalentURL,
                                      self.strRealm.replace(' ', '+'),
-                                     self.strCharacter)         
-
-        # Open url.
-        # Need to specify firefox as user agent as this makes the server
-        # return an XML file. If this is not done we get html.
-        oOpener = urllib2.build_opener()
-        oOpener.addheaders = [
-           ('user-agent',
-            'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'),
-           ]
-        req = urllib2.Request(strURL)
-        self.strTalentFile = oOpener.open(req).read()
+                                     self.strCharacter)
+        self.strTalentFile = self.open_url(strURL)
         return
 
     def parse_char_file(self):

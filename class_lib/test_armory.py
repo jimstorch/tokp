@@ -6,10 +6,14 @@
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
+from tictoc import TicToc
 from read_armory import ArmoryCharacter
 
 # Pull out a character from the Armory
+T = TicToc()
+T.tic()
 Sarkoris = ArmoryCharacter('Sarkoris','Alleria','US')
+T.toc()
 
 # Print output for verification
 print '%s: %s %s' % (Sarkoris.Name, Sarkoris.Race, Sarkoris.Class)
@@ -21,3 +25,4 @@ print '%s: %s' % (Sarkoris.TalentSpec, Sarkoris.Stats['TalentTree'])
 ##print Sarkoris.Stats['BaseStats']
 ##print Sarkoris.Stats['TotalStats']
 ##print Sarkoris.Stats['TalentTree']
+
