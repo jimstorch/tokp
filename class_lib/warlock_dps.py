@@ -14,10 +14,10 @@ from warlock_class import Warlock
 from spell_rotation import SpellRotation
 
 ## Define the Warlock
-Lavode = Warlock()
+Lavode = Warlock('Lavode','Alleria','US')
 
 ## Define the Spec
-Lavode.SetCommonSpec('UADR')
+##Lavode.SetCommonSpec('UADR')
 
 temp = [Lavode.Nuke['SB'], Lavode.Nuke['SB']]
 SB_only = SpellRotation(temp)

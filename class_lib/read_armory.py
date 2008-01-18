@@ -94,22 +94,25 @@ class ArmoryCharacter(object):
         strName = (('character', 'name'),)
         strClass = (('character', 'class'),)
         strRace = (('character', 'race'),)
-        strCharStats = (('Name', strName),
-                        ('Class', strClass),
-                        ('Race', strRace))
-        self.read_xml_chunk(CharDoc, strCharStats, 0)
-        self.Name = self.Stats['Name']
-        self.Class = self.Stats['Class']
-        self.Race = self.Stats['Race']
+        strCharStats = (('Name', strName, 0),
+                        ('Class', strClass, 0),
+                        ('Race', strRace, 0))
+        Stats = self.read_xml_chunk(CharDoc, strCharStats)
+        self.Name = Stats['Name']
+        self.Class = Stats['Class']
+        self.Race = Stats['Race']
+##        self.Name = self.Stats['Name']
+##        self.Class = self.Stats['Class']
+##        self.Race = self.Stats['Race']
         
         # Pull out talent spec numbers
-        strTalentSpec = (('talentSpec', 'treeOne'),
-                         ('talentSpec', 'treeTwo'),
-                         ('talentSpec', 'treeThree'))
-        self.TalentSpec = (self.read_xml_snippet(CharDoc, strTalentSpec[0], 1),
-                           self.read_xml_snippet(CharDoc, strTalentSpec[1], 1),
-                           self.read_xml_snippet(CharDoc, strTalentSpec[2], 1))
-        self.Stats['TalentSpec'] = self.TalentSpec
+        strTalentSpec = (('talentSpec', 'treeOne', 1),
+                         ('talentSpec', 'treeTwo', 1),
+                         ('talentSpec', 'treeThree', 1))
+        self.TalentSpec = (self.read_xml_snippet(CharDoc, strTalentSpec[0]),
+                           self.read_xml_snippet(CharDoc, strTalentSpec[1]),
+                           self.read_xml_snippet(CharDoc, strTalentSpec[2]))
+##        self.Stats['TalentSpec'] = self.TalentSpec
 
         # Pull out base stats and effective stats (integer values)
         strBaseStats = (('strength', 'base'),
@@ -124,9 +127,34 @@ class ArmoryCharacter(object):
                          ('intellect', 'effective'),
                          ('spirit', 'effective'),
                          ('armor', 'effective'))
-        strCharStats = (('BaseStats', strBaseStats),
-                        ('TotalStats', strTotalStats))
-        self.read_xml_chunk(CharDoc, strCharStats, 1)
+        strCharStats = (('BaseStats', strBaseStats, 1),
+                        ('TotalStats', strTotalStats, 1))
+        Stats = self.read_xml_chunk(CharDoc, strCharStats)
+        self.BaseStats = Stats['BaseStats']
+        self.TotalStats = Stats['TotalStats']
+
+        # Pull out spell damage, crit rating and crit chance
+        strSpellDmg = (('arcane', 'value'),
+                       ('fire', 'value'),
+                       ('frost', 'value'),
+                       ('holy', 'value'),
+                       ('nature', 'value'),
+                       ('shadow', 'value'))
+        strSpellCritR = (('critChance', 'rating', 1),)
+        strSpellCrit = (('arcane', 'percent'),
+                        ('fire', 'percent'),
+                        ('frost', 'percent'),
+                        ('holy', 'percent'),
+                        ('nature', 'percent'),
+                        ('shadow', 'percent'))
+        strCharStats = (('SpellDmg', strSpellDmg, 1),
+                        ('SpellCrit', strSpellCrit, 2))
+        print "test 1"
+        self.SpellCritRating = self.read_xml_snippet(CharDoc, strSpellCritR[0])
+        print "test 2"
+        Stats = self.read_xml_chunk(CharDoc, strCharStats)
+        self.SpellDmg = Stats['SpellDmg']
+        self.SpellCrit = Stats['SpellCrit']
 
         return
 
@@ -139,29 +167,38 @@ class ArmoryCharacter(object):
 
         # Pull out talent spec (string of digits)
         strTalentTree = (('talentTree', 'value'),)
-        strTalentStats = (('TalentTree', strTalentTree),)
-        self.read_xml_chunk(TalentDoc, strTalentStats, 0)
+        strTalentStats = (('TalentTree', strTalentTree, 0),)
+        Stats = self.read_xml_chunk(TalentDoc, strTalentStats)
+        self.TalentTree = Stats['TalentTree']
         return
 
-    def read_xml_snippet(self, CurDoc, strStats, IsIntValue):
-        strElement, strAttribute = strStats
+    def read_xml_snippet(self, CurDoc, strStats):
+        print strStats
+        strElement, strAttribute, ValueType = strStats
         DocElement = CurDoc.getElementsByTagName(strElement)[0]
         strValue = DocElement.getAttribute(strAttribute)
-        if IsIntValue:
+        print strValue
+        if (ValueType == 1):
             curValue = int(strValue)
+        elif (ValueType == 2):
+            print strValue
+            curValue = float(strValue)
         else:
             curValue = str(strValue)
         return curValue
 
-    def read_xml_chunk(self, CurDoc, strStats, IsIntValue):
-        for strStatName, strCurStat in strStats:
+    def read_xml_chunk(self, CurDoc, strStats):
+        Stats = {}
+        for strStatName, strCurStat, ValueType  in strStats:
             strElementValue = {}
             for strElement, strAttribute in strCurStat:
-                curValue = self.read_xml_snippet(CurDoc,(strElement,strAttribute),IsIntValue)
+                curValue = self.read_xml_snippet(CurDoc,(strElement,strAttribute,ValueType))
                 strElementValue[strElement] = curValue
             if (len(strElementValue) > 1):
-                self.Stats[strStatName] = strElementValue
+                Stats[strStatName] = strElementValue
+##                self.Stats[strStatName] = strElementValue
             else:
-                self.Stats[strStatName] = curValue
-        return
+                Stats[strStatName] = curValue
+##                self.Stats[strStatName] = curValue
+        return Stats
 #------------------------------------------------------------------------------
