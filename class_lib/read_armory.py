@@ -91,12 +91,12 @@ class ArmoryCharacter(object):
         CharDoc = xml.dom.minidom.parseString(self.strCharFile)
 
         # Pull out name, class, race (string values)
-        strName = (('character', 'name'),)
-        strClass = (('character', 'class'),)
-        strRace = (('character', 'race'),)
-        strCharStats = (('Name', strName, 0),
-                        ('Class', strClass, 0),
-                        ('Race', strRace, 0))
+        strName = (('character', 'name',0),)
+        strClass = (('character', 'class',0),)
+        strRace = (('character', 'race',0),)
+        strCharStats = (('Name', strName),
+                        ('Class', strClass),
+                        ('Race', strRace))
         Stats = self.read_xml_chunk(CharDoc, strCharStats)
         self.Name = Stats['Name']
         self.Class = Stats['Class']
@@ -115,46 +115,49 @@ class ArmoryCharacter(object):
 ##        self.Stats['TalentSpec'] = self.TalentSpec
 
         # Pull out base stats and effective stats (integer values)
-        strBaseStats = (('strength', 'base'),
-                        ('agility', 'base'),
-                        ('stamina', 'base'),
-                        ('intellect', 'base'),
-                        ('spirit', 'base'),
-                        ('armor', 'base'))
-        strTotalStats = (('strength', 'effective'),
-                         ('agility', 'effective'),
-                         ('stamina', 'effective'),
-                         ('intellect', 'effective'),
-                         ('spirit', 'effective'),
-                         ('armor', 'effective'))
-        strCharStats = (('BaseStats', strBaseStats, 1),
-                        ('TotalStats', strTotalStats, 1))
+        strBaseStats = (('strength', 'base',1),
+                        ('agility', 'base',1),
+                        ('stamina', 'base',1),
+                        ('intellect', 'base',1),
+                        ('spirit', 'base',1),
+                        ('armor', 'base',1))
+        strTotalStats = (('strength', 'effective',1),
+                         ('agility', 'effective',1),
+                         ('stamina', 'effective',1),
+                         ('intellect', 'effective',1),
+                         ('spirit', 'effective',1),
+                         ('armor', 'effective',1))
+        strCharStats = (('BaseStats', strBaseStats),
+                        ('TotalStats', strTotalStats))
         Stats = self.read_xml_chunk(CharDoc, strCharStats)
         self.BaseStats = Stats['BaseStats']
         self.TotalStats = Stats['TotalStats']
 
-        # Pull out spell damage, crit rating and crit chance
-        strSpellDmg = (('arcane', 'value'),
-                       ('fire', 'value'),
-                       ('frost', 'value'),
-                       ('holy', 'value'),
-                       ('nature', 'value'),
-                       ('shadow', 'value'))
-        strSpellCritR = (('critChance', 'rating', 1),)
-        strSpellCrit = (('arcane', 'percent'),
-                        ('fire', 'percent'),
-                        ('frost', 'percent'),
-                        ('holy', 'percent'),
-                        ('nature', 'percent'),
-                        ('shadow', 'percent'))
-        strCharStats = (('SpellDmg', strSpellDmg, 1),
-                        ('SpellCrit', strSpellCrit, 2))
-        print "test 1"
-        self.SpellCritRating = self.read_xml_snippet(CharDoc, strSpellCritR[0])
-        print "test 2"
+        # Pull out spell damage, hit rating, hit percentage, crit rating and crit percentage
+        strSpellDmg = (('spell','bonusDamage','arcane','value',1),
+                       ('spell','bonusDamage','fire','value',1),
+                       ('spell','bonusDamage','frost','value',1),
+                       ('spell','bonusDamage','holy','value',1),
+                       ('spell','bonusDamage','nature','value',1),
+                       ('spell','bonusDamage','shadow','value',1))
+        strSpellHitR = (('spell','bonusDamage','hitRating','value',1),)
+        strSpellHit = (('spell','bonusDamage','hitRating','increasedHitPercent',2),)
+        strSpellCritR = (('spell','bonusDamage','critChance','rating',1),)
+        strSpellCrit = (('spell','bonusDamage','arcane','percent',2),
+                        ('spell','bonusDamage','fire','percent',2),
+                        ('spell','bonusDamage','frost','percent',2),
+                        ('spell','bonusDamage','holy','percent',2),
+                        ('spell','bonusDamage','nature','percent',2),
+                        ('spell','bonusDamage','shadow','percent',2))
+        strCharStats = (('SpellDmg', strSpellDmg),
+                        ('SpellHitRating', strSpellHitR),
+                        ('SpellHit', strSpellHit),
+                        ('SpellCritRating', strSpellCritR),
+                        ('SpellCrit', strSpellCrit))
+##        print "test 1"
         Stats = self.read_xml_chunk(CharDoc, strCharStats)
-        self.SpellDmg = Stats['SpellDmg']
-        self.SpellCrit = Stats['SpellCrit']
+##        self.SpellDmg = Stats['SpellDmg']
+##        self.SpellCrit = Stats['SpellCrit']
 
         return
 
@@ -172,33 +175,42 @@ class ArmoryCharacter(object):
         self.TalentTree = Stats['TalentTree']
         return
 
-    def read_xml_snippet(self, CurDoc, strStats):
-        print strStats
-        strElement, strAttribute, ValueType = strStats
-        DocElement = CurDoc.getElementsByTagName(strElement)[0]
-        strValue = DocElement.getAttribute(strAttribute)
-        print strValue
+    def read_xml_snippet(self, curDoc, EleAttVal):
+        # split EleAttVal into Elements, Attribute, ValueType
+        numElements = len(EleAttVal) - 2
+        allElements = EleAttVal[:numElements]
+        strAttribute, ValueType = EleAttVal[numElements:]
+
+        # pull out the value from the nested element
+        prevElement = curDoc
+        for curElement in allElements:
+            print curElement
+            print prevElement.getElementsByTagName(curElement)
+            newElement = prevElement.getElementsByTagName(curElement)[0]
+            print newElement
+            prevElement = newElement
+        curValue = newElement.getAttribute(strAttribute)
+
+        # modify the value if it is not intended to be a string
         if (ValueType == 1):
-            curValue = int(strValue)
+            curValue = int(curValue)
         elif (ValueType == 2):
             print strValue
-            curValue = float(strValue)
+            curValue = float(curValue)
         else:
-            curValue = str(strValue)
+            curValue = str(curValue)
         return curValue
 
-    def read_xml_chunk(self, CurDoc, strStats):
-        Stats = {}
-        for strStatName, strCurStat, ValueType  in strStats:
-            strElementValue = {}
-            for strElement, strAttribute in strCurStat:
-                curValue = self.read_xml_snippet(CurDoc,(strElement,strAttribute,ValueType))
-                strElementValue[strElement] = curValue
-            if (len(strElementValue) > 1):
-                Stats[strStatName] = strElementValue
-##                self.Stats[strStatName] = strElementValue
+    def read_xml_chunk(self, curDoc, strEleAttVal):
+        dicItems = {}
+        for strItemName, curItem in strEleAttVal:
+            curElementValue = {}
+            for EleAttVal in curItem:
+                curValue = self.read_xml_snippet(curDoc,EleAttVal)
+                curElementValue[EleAttVal[len(EleAttVal)-3]] = curValue
+            if (len(curElementValue) > 1):
+                dicItems[strItemName] = curElementValue
             else:
-                Stats[strStatName] = curValue
-##                self.Stats[strStatName] = curValue
-        return Stats
+                dicItems[strItemName] = curValue
+        return dicItems
 #------------------------------------------------------------------------------
