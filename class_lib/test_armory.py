@@ -17,7 +17,7 @@ T.toc()
 
 # Print output for verification
 print '%s: %s %s' % (Sarkoris.Name, Sarkoris.Race, Sarkoris.Class)
-print '%s: %s' % (Sarkoris.TalentSpec, Sarkoris.Stats['TalentTree'])
+print '%s: %s' % (Sarkoris.TalentSpec, Sarkoris.TalentTree)
 ##print Sarkoris.Stats
 ##print Sarkoris.Stats['Name']
 ##print Sarkoris.Stats['Class']
@@ -25,4 +25,5 @@ print '%s: %s' % (Sarkoris.TalentSpec, Sarkoris.Stats['TalentTree'])
 ##print Sarkoris.Stats['BaseStats']
 ##print Sarkoris.Stats['TotalStats']
 ##print Sarkoris.Stats['TalentTree']
-
+##print Sarkoris.SpellDmg
+##print Sarkoris.SpellCrit

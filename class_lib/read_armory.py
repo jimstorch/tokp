@@ -1,21 +1,18 @@
 #------------------------------------------------------------------------------
 #   File:       read_armory.py
 #   Purpose:    
-#   Author:     Peter Clive Wilkinson
-#   Revised:    James Mynderse
+#   Author:     James Mynderse
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
 import urllib
 import urllib2
-import xml.dom.minidom
-
-nullValue = ('null', 'value')
-nullStat = ('null', nullValue)
+from xml.etree import cElementTree as et
 
 #----[ ARMORYCHARACTER CLASS ]-------------------------------------------------
 class ArmoryCharacter(object):
 
+    #--[ ]--
     def __init__(self,strCharacter,strRealm,strLocale):
         self.strCharacter = strCharacter
         self.strRealm = strRealm
@@ -25,6 +22,7 @@ class ArmoryCharacter(object):
         self.parse_armory()
         return
 
+    #--[ ]--
     def read_armory(self):
         # Set base URL based on character location
         if self.strLocale == 'US':
@@ -38,31 +36,27 @@ class ArmoryCharacter(object):
         self.read_talent_tab()
         return
 
+    #--[ ]--
     def parse_armory(self):
         # Parse character and talent tabs from xml read
         self.parse_char_file()
         self.parse_talent_file()
         return
 
+    #--[ ]--
     def open_url(self, strURL):
+        # Define the user_agent as Mozilla
         user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'
         strHeaders = {'User-Agent':user_agent}
         values = {}
+        # Encode and Request the URL
         strData = urllib.urlencode(values)
         request = urllib2.Request(strURL,strData,strHeaders)
         response = urllib2.urlopen(request)
         strXMLFile = response.read()
-
-##        oOpener = urllib2.build_opener()
-##        oOpener.addheaders = [
-##           ('user-agent',
-##            'Mozilla/5.0 (Windows; U; Windows NT 5.0; en-GB; rv:1.8.1.4) Gecko/20070515 Firefox/2.0.0.4'),
-##           ]
-##        req = urllib2.Request(strURL)
-##        strXMLFile = oOpener.open(req).read()
-        
         return strXMLFile
     
+    #--[ ]--
     def read_character_tab(self):
         # Look the data up in the armory
         strCharURL = 'character-sheet.xml'
@@ -71,8 +65,12 @@ class ArmoryCharacter(object):
                                      self.strRealm.replace(' ', '+'),
                                      self.strCharacter)
         self.strCharFile = self.open_url(strURL)
+        # Parse the XML into a dictionary
+        tree = et.fromstring(self.strCharFile)
+        self.dicChar = self.dig_xml(tree)
         return
 
+    #--[ ]--
     def read_talent_tab(self):
         # Look the data up in the armory
         strTalentURL = 'character-talents.xml'
@@ -81,136 +79,100 @@ class ArmoryCharacter(object):
                                      self.strRealm.replace(' ', '+'),
                                      self.strCharacter)
         self.strTalentFile = self.open_url(strURL)
+        # Parse the XML into a dictionary
+        tree = et.fromstring(self.strTalentFile)
+        self.dicTalent = self.dig_xml(tree)
         return
 
-    def parse_char_file(self):
-        # Now have raw xml file, can print it if interested
-##        print self.strCharFile
-         
-        # Use xml dom to parse the file
-        CharDoc = xml.dom.minidom.parseString(self.strCharFile)
-
-        # Pull out name, class, race (string values)
-        strName = (('character', 'name',0),)
-        strClass = (('character', 'class',0),)
-        strRace = (('character', 'race',0),)
-        strCharStats = (('Name', strName),
-                        ('Class', strClass),
-                        ('Race', strRace))
-        Stats = self.read_xml_chunk(CharDoc, strCharStats)
-        self.Name = Stats['Name']
-        self.Class = Stats['Class']
-        self.Race = Stats['Race']
-##        self.Name = self.Stats['Name']
-##        self.Class = self.Stats['Class']
-##        self.Race = self.Stats['Race']
-        
-        # Pull out talent spec numbers
-        strTalentSpec = (('talentSpec', 'treeOne', 1),
-                         ('talentSpec', 'treeTwo', 1),
-                         ('talentSpec', 'treeThree', 1))
-        self.TalentSpec = (self.read_xml_snippet(CharDoc, strTalentSpec[0]),
-                           self.read_xml_snippet(CharDoc, strTalentSpec[1]),
-                           self.read_xml_snippet(CharDoc, strTalentSpec[2]))
-##        self.Stats['TalentSpec'] = self.TalentSpec
-
-        # Pull out base stats and effective stats (integer values)
-        strBaseStats = (('strength', 'base',1),
-                        ('agility', 'base',1),
-                        ('stamina', 'base',1),
-                        ('intellect', 'base',1),
-                        ('spirit', 'base',1),
-                        ('armor', 'base',1))
-        strTotalStats = (('strength', 'effective',1),
-                         ('agility', 'effective',1),
-                         ('stamina', 'effective',1),
-                         ('intellect', 'effective',1),
-                         ('spirit', 'effective',1),
-                         ('armor', 'effective',1))
-        strCharStats = (('BaseStats', strBaseStats),
-                        ('TotalStats', strTotalStats))
-        Stats = self.read_xml_chunk(CharDoc, strCharStats)
-        self.BaseStats = Stats['BaseStats']
-        self.TotalStats = Stats['TotalStats']
-
-        # Pull out spell damage, hit rating, hit percentage, crit rating and crit percentage
-        strSpellDmg = (('spell','bonusDamage','arcane','value',1),
-                       ('spell','bonusDamage','fire','value',1),
-                       ('spell','bonusDamage','frost','value',1),
-                       ('spell','bonusDamage','holy','value',1),
-                       ('spell','bonusDamage','nature','value',1),
-                       ('spell','bonusDamage','shadow','value',1))
-        strSpellHitR = (('spell','bonusDamage','hitRating','value',1),)
-        strSpellHit = (('spell','bonusDamage','hitRating','increasedHitPercent',2),)
-        strSpellCritR = (('spell','bonusDamage','critChance','rating',1),)
-        strSpellCrit = (('spell','bonusDamage','arcane','percent',2),
-                        ('spell','bonusDamage','fire','percent',2),
-                        ('spell','bonusDamage','frost','percent',2),
-                        ('spell','bonusDamage','holy','percent',2),
-                        ('spell','bonusDamage','nature','percent',2),
-                        ('spell','bonusDamage','shadow','percent',2))
-        strCharStats = (('SpellDmg', strSpellDmg),
-                        ('SpellHitRating', strSpellHitR),
-                        ('SpellHit', strSpellHit),
-                        ('SpellCritRating', strSpellCritR),
-                        ('SpellCrit', strSpellCrit))
-##        print "test 1"
-        Stats = self.read_xml_chunk(CharDoc, strCharStats)
-##        self.SpellDmg = Stats['SpellDmg']
-##        self.SpellCrit = Stats['SpellCrit']
-
-        return
-
-    def parse_talent_file(self):
-        # Now have raw xml file, can print it if interested
-##        print self.strTalentFile
-
-        # Use xml dom to parse the file
-        TalentDoc = xml.dom.minidom.parseString(self.strTalentFile)
-
-        # Pull out talent spec (string of digits)
-        strTalentTree = (('talentTree', 'value'),)
-        strTalentStats = (('TalentTree', strTalentTree, 0),)
-        Stats = self.read_xml_chunk(TalentDoc, strTalentStats)
-        self.TalentTree = Stats['TalentTree']
-        return
-
-    def read_xml_snippet(self, curDoc, EleAttVal):
-        # split EleAttVal into Elements, Attribute, ValueType
-        numElements = len(EleAttVal) - 2
-        allElements = EleAttVal[:numElements]
-        strAttribute, ValueType = EleAttVal[numElements:]
-
-        # pull out the value from the nested element
-        prevElement = curDoc
-        for curElement in allElements:
-            print curElement
-            print prevElement.getElementsByTagName(curElement)
-            newElement = prevElement.getElementsByTagName(curElement)[0]
-            print newElement
-            prevElement = newElement
-        curValue = newElement.getAttribute(strAttribute)
-
-        # modify the value if it is not intended to be a string
-        if (ValueType == 1):
-            curValue = int(curValue)
-        elif (ValueType == 2):
-            print strValue
-            curValue = float(curValue)
+    #--[ ]--   
+    def dig_xml(self, root):
+        out = {}
+        children = root.getchildren()
+        if len(children) > 0:
+            for child in children:
+                out[child.tag] = self.dig_xml(child)
         else:
-            curValue = str(curValue)
-        return curValue
+            # get all the element attributes
+            for Attr in root.attrib.keys():
+                out[Attr] = self.sort_alnum_values(root.attrib.get(Attr))
 
-    def read_xml_chunk(self, curDoc, strEleAttVal):
-        dicItems = {}
-        for strItemName, curItem in strEleAttVal:
-            curElementValue = {}
-            for EleAttVal in curItem:
-                curValue = self.read_xml_snippet(curDoc,EleAttVal)
-                curElementValue[EleAttVal[len(EleAttVal)-3]] = curValue
-            if (len(curElementValue) > 1):
-                dicItems[strItemName] = curElementValue
-            else:
-                dicItems[strItemName] = curValue
-        return dicItems
+            # get the text value (if it exists)
+            if root.text:
+                self.sort_alnum_values(root.text)
+        return out
+
+    #--[ ]--
+    def sort_alnum_values(self, value):
+        # determine what type of value is represented: int, float, str
+        if value.isdigit():
+            out = int(value)
+        elif value.replace('.','0',1).isdigit():
+            out = float(value)
+        else:
+            out = value
+        return out
+
+    #--[ ]--
+    def parse_char_file(self):
+        # Name, Class and Race
+        key_list = ['characterInfo','character','name']
+        self.Name = self.read_dict(self.dicChar, key_list)
+        key_list = ['characterInfo','character','class']
+        self.Class = self.read_dict(self.dicChar, key_list)
+        key_list = ['characterInfo','character','race']
+        self.Race = self.read_dict(self.dicChar, key_list)
+
+        # Talent Spec
+        tree = (('characterInfo','characterTab','talentSpec','treeOne'),
+                ('characterInfo','characterTab','talentSpec','treeTwo'),
+                ('characterInfo','characterTab','talentSpec','treeThree'))
+        self.TalentSpec = (self.read_dict(self.dicChar, tree[0]),
+                           self.read_dict(self.dicChar, tree[1]),
+                           self.read_dict(self.dicChar, tree[2]))
+        
+        # Base and Effective Stats
+        key_list = ['characterInfo','characterTab','baseStats']
+        stat_list = ['strength','agility','stamina','intellect','spirit','armor']
+        self.BaseStats = {}
+        self.EffectiveStats = {}
+        for stat in stat_list:
+            base = []
+            base.extend(key_list)
+            base.extend([stat, 'base'])
+            eff = []
+            eff.extend(key_list)
+            eff.extend([stat, 'effective'])
+            self.BaseStats[stat] = self.read_dict(self.dicChar, base)
+            self.EffectiveStats[stat] = self.read_dict(self.dicChar, eff)
+
+        # Spell Damage
+        key_list = ['characterInfo','characterTab','spell']
+        stat_list = ['arcane','fire','frost','holy','nature','shadow']
+        self.SpellDmg = {}
+        self.SpellCrit = {}
+        for stat in stat_list:
+            dmg = []
+            dmg.extend(key_list)
+            dmg.extend(['bonusDamage', stat, 'value'])
+            self.SpellDmg[stat] = self.read_dict(self.dicChar, dmg)
+            crit = []
+            crit.extend(key_list)
+            crit.extend(['critChance', stat, 'percent'])
+            self.SpellCrit[stat] = self.read_dict(self.dicChar, crit)
+        return
+
+    #--[ ]--
+    def parse_talent_file(self):
+        # Talent Tree
+        key_list = ('characterInfo','talentTab','talentTree','value')
+        self.TalentTree = self.read_dict(self.dicTalent, key_list)
+        return
+
+    #--[ ]--
+    def read_dict(self, root, key_list):
+        out = root
+        for key in key_list:
+            out = out[key]
+        return out
+
 #------------------------------------------------------------------------------
