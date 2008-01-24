@@ -12,7 +12,7 @@ from read_armory import ArmoryCharacter
 # Pull out a character from the Armory
 T = TicToc()
 T.tic()
-Sarkoris = ArmoryCharacter('Sarkoris','Alleria','US')
+Sarkoris = ArmoryCharacter('Lavode','Alleria','US')
 T.toc()
 
 # Print output for verification

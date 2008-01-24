@@ -6,6 +6,33 @@
 #   License:    GPLv3 see LICENSE.TXT    
 #------------------------------------------------------------------------------
 
+def ParseSpec(TalentTree):
+    ii = (0, 21, 43)
+    Spec = {'ImpCor':int(TalentTree[ii[0]+1]),
+            'ImpCoA':int(TalentTree[ii[0]+6]),
+            'AmpCurse':int(TalentTree[ii[0]+8]),
+            'Nightfall':int(TalentTree[ii[0]+10]),
+            'EmpCor':int(TalentTree[ii[0]+11]),
+            'SiphonLife':int(TalentTree[ii[0]+13]),
+            'ShadowMastery':int(TalentTree[ii[0]+15]),
+            'Contagion':int(TalentTree[ii[0]+16]),
+            'UA':int(TalentTree[ii[0]+20]),
+            'DemonicAeg':int(TalentTree[ii[1]+9]),
+            'UnholyPow':int(TalentTree[ii[1]+11]),
+            'SucSac':int(TalentTree[ii[1]+13]),
+            'MasterD':int(TalentTree[ii[1]+16]),
+            'SoulLink':int(TalentTree[ii[1]+18]),
+            'DemonicKno':int(TalentTree[ii[1]+19]),
+            'DemonicTac':int(TalentTree[ii[1]+20]),
+            'Felguard':int(TalentTree[ii[1]+21]),
+            'ISB':int(TalentTree[ii[2]+0]),
+            'Bane':int(TalentTree[ii[2]+2]),
+            'Deva':int(TalentTree[ii[2]+6]),
+            'Ruin':int(TalentTree[ii[2]+13]),
+            'BackLash':int(TalentTree[ii[2]+16]),
+            'SnF':int(TalentTree[ii[2]+19])}
+    return Spec
+
 def WarlockSpecs():
     ## Define the empty spec
     EmptySpec = {'ImpCor':0,

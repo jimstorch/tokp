@@ -104,9 +104,10 @@ class ArmoryCharacter(object):
     #--[ ]--
     def sort_alnum_values(self, value):
         # determine what type of value is represented: int, float, str
-        if value.isdigit():
+        # (leading value of zero is a special case for talent tree)
+        if value.isdigit() and value[0] != '0':
             out = int(value)
-        elif value.replace('.','0',1).isdigit():
+        elif value.replace('.','0',1).isdigit() and value[0] != '0':
             out = float(value)
         else:
             out = value

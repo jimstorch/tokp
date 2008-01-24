@@ -10,7 +10,7 @@
 Quantify ideal Warlock dps based on talents and spell selection
 '''
 
-from warlock_class import Warlock
+from warlock_class_armory import Warlock
 from spell_rotation import SpellRotation
 
 ## Define the Warlock
@@ -19,13 +19,13 @@ Lavode = Warlock('Lavode','Alleria','US')
 ## Define the Spec
 ##Lavode.SetCommonSpec('UADR')
 
-temp = [Lavode.Nuke['SB'], Lavode.Nuke['SB']]
-SB_only = SpellRotation(temp)
-print SB_only.TotalDamage
-print SB_only.TotalCastTime
-print SB_only.TotalManaCost
-print SB_only.DPS
-print SB_only.DPM
+##temp = [Lavode.Nuke['SB'], Lavode.Nuke['SB']]
+##SB_only = SpellRotation(temp)
+##print SB_only.TotalDamage
+##print SB_only.TotalCastTime
+##print SB_only.TotalManaCost
+##print SB_only.DPS
+##print SB_only.DPM
 
 #### Define the fight duration [sec]
 ##fight_duration = 10 * 60
