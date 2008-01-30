@@ -13,8 +13,13 @@ Quantify ideal Warlock dps based on talents and spell selection
 from warlock_class_armory import Warlock
 from spell_rotation import SpellRotation
 
+## Assumptions
+Assumptions = {'SW':5,
+               'Misery':5,
+               'ISB':5}
+
 ## Define the Warlock
-Lavode = Warlock('Lavode','Alleria','US')
+Lavode = Warlock('Lavode','Alleria','US',Assumptions)
 
 ## Define the Spec
 ##Lavode.SetCommonSpec('UADR')

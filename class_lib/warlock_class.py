@@ -64,7 +64,8 @@ class Warlock(object):
                 DoTSpellDmg = self.SpellDmg
             CurDoT['Damage'] = CurDoT['BaseDamage']
             CurDoT['Damage'] += (CurDoT['DmgPerc'] * DoTSpellDmg)
-            CurDoT['Damage'] *= (1 + CurDoT['Shadow'] * self.Spec['ShadowMastery'] * 0.02)
+            if not (CurDot['Name'] == 'Curse of Doom')
+                CurDoT['Damage'] *= (1 + CurDoT['Shadow'] * self.Spec['ShadowMastery'] * 0.02)
             if CurDoT['Name'] == 'Curse of Agony' or CurDoT['Name'] == 'Corruption':
                 CurDoT['Damage'] *= (1 + self.Spec['Contagion'] * 0.05)
             CurDoT['Damage'] *= (1 + CurDoT['Shadow'] * self.Spec['SucSac'] * 0.15)

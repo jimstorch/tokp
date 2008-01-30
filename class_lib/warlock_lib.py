@@ -173,7 +173,8 @@ def WarlockSpecs():
 def WarlockDoT():
 
     ## Curse of Agony
-    CoA = {'Name':'Curse of Agony',
+    CoA = {'Handle':'curse_of_agony',
+           'Name':'Curse of Agony',
            'BaseDamage':1356,
            'BaseCast':0,
            'Duration':24,
@@ -184,7 +185,8 @@ def WarlockDoT():
            }
 
     ## Curse of Doom
-    CoD = {'Name':'Curse of Doom',
+    CoD = {'Handle':'curse_of_doom',
+           'Name':'Curse of Doom',
            'BaseDamage':4200,
            'BaseCast':0,
            'Duration':60,
@@ -195,7 +197,8 @@ def WarlockDoT():
            }
 
     ## Corruption
-    Cor = {'Name':'Corruption',
+    Cor = {'Handle','corruption',
+           'Name':'Corruption',
            'BaseDamage':906,
            'BaseCast':2,
            'Duration':18,
@@ -206,7 +209,8 @@ def WarlockDoT():
            }
 
     ## Siphon Life
-    SL =  {'Name':'Siphon Life',
+    SL =  {'Handle':'siphon_life',
+           'Name':'Siphon Life',
            'BaseDamage':630,
            'BaseCast':0,
            'Duration':30,
@@ -217,7 +221,8 @@ def WarlockDoT():
            }
     
     ## Unstable Affliction
-    UA =  {'Name':'Unstable Affliction',
+    UA =  {'Handle':'unstable_affliction',
+           'Name':'Unstable Affliction',
            'BaseDamage':1050,
            'BaseCast':1.5,
            'Duration':18,
@@ -232,7 +237,8 @@ def WarlockDoT():
 
 def WarlockNuke():
 
-    SB = {'Name':'Shadow Bolt',
+    shadow_bolt = {'Handle':'shadow_bolt',
+          'Name':'Shadow Bolt',
           'BaseDamage':mean(541,603),
           'BaseCast':3,
           'DmgPerc':0.8571,
@@ -240,7 +246,8 @@ def WarlockNuke():
           'Shadow':1,
           }
 
-    Inc = {'Name':'Incinerate',
+    incinerate = {'Handle':'incinerate',
+                  'Name':'Incinerate',
            'BaseDamage':mean(444,514),
            'BaseCast':2.5,
            'DmgPerc':0.8571,
@@ -248,7 +255,7 @@ def WarlockNuke():
            'Shadow':0,
            }
 
-    WarlockNuke = {'SB':SB}
+    WarlockNuke = {'shadow_bolt':shadow_bolt, 'incinerate':incinerate}
     return WarlockNuke
 
 
