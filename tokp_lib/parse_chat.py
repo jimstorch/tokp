@@ -16,7 +16,6 @@ from tokp_lib.zones import get_loot_dict
 loot_str = r"^(?P<name>.+)\sreceive[s]?\sloot:\s(?P<item>.+)\."
 loot_obj = re.compile(loot_str)
 
-
 def parse_chat(parse_from, parse_to, chat_log, roster, you):
 
     log = open(chat_log, 'rU')
