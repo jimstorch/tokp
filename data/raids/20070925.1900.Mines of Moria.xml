@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<raid date="09/25/2007">
+    <zone>Mines of Moria</zone>
+    <start_time>2007-09-25 19:00:00.000000</start_time>
+    <end_time>2007-09-25 22:00:00.000000</end_time>
+    <members>
+        <name>Aragorn</name>
+        <name>Arwen</name>
+        <name>Barliman</name>
+        <name>Bilbo</name>
+        <name>Boromir</name>
+        <name>Bounder</name>
+        <name>Celeborn</name>
+        <name>Curly</name>
+        <name>Everard</name>
+        <name>Gandalf</name>
+        <name>Gimli</name>
+        <name>Gollum</name>
+        <name>Haldir</name>
+        <name>Legolas</name>
+        <name>Lurtz</name>
+        <name>Maggot</name>
+        <name>Merry</name>
+        <name>Proudfoot</name>
+        <name>Sam</name>
+        <name>Saruman</name>
+    </members>
+</raid>

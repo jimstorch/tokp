@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<raid date="09/01/2007">
+    <zone>Mordor</zone>
+    <start_time>2007-09-01 19:00:00.000000</start_time>
+    <end_time>2007-09-01 22:00:00.000000</end_time>
+    <members>
+        <name>Aragorn</name>
+        <name>Arwen</name>
+        <name>Barliman</name>
+        <name>Bilbo</name>
+        <name>Boromir</name>
+        <name>Bounder</name>
+        <name>Curly</name>
+        <name>Galadriel</name>
+        <name>Gandalf</name>
+        <name>Gilgalad</name>
+        <name>Gimli</name>
+        <name>Gollum</name>
+        <name>Larry</name>
+        <name>Legolas</name>
+        <name>Lendil</name>
+        <name>Maggot</name>
+        <name>Merry</name>
+        <name>Peregrin</name>
+        <name>Proudfoot</name>
+        <name>Sauron</name>
+    </members>
+</raid>
