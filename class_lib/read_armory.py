@@ -60,10 +60,10 @@ class ArmoryCharacter(object):
     def read_character_tab(self):
         # Look the data up in the armory
         strCharURL = 'character-sheet.xml'
-        strURL = '%s%s?r=%s&n=%s' % (self.strBaseURL,
+        strURL = '%s%s?r=%s&gn=%s' % (self.strBaseURL,
                                      strCharURL,
                                      self.strRealm.replace(' ', '+'),
-                                     self.strCharacter)
+                                     self.strCharacter.replace(' ', '+'))
         self.strCharFile = self.open_url(strURL)
         # Parse the XML into a dictionary
         tree = et.fromstring(self.strCharFile)
@@ -77,7 +77,7 @@ class ArmoryCharacter(object):
         strURL = '%s%s?r=%s&n=%s' % (self.strBaseURL,
                                      strTalentURL,
                                      self.strRealm.replace(' ', '+'),
-                                     self.strCharacter)
+                                     self.strCharacter.replace(' ', '+'))
         self.strTalentFile = self.open_url(strURL)
         # Parse the XML into a dictionary
         tree = et.fromstring(self.strTalentFile)
