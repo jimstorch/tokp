@@ -49,15 +49,15 @@ if options.version:
     print "Version number is", VERSION
     sys.exit()
 
-if not options.name:
-    print "[Error] Missing -n NAME argument. Try '-h' for help."
-    exit(1)    
+#if not options.name:
+#    print "[Error] Missing -n NAME argument. Try '-h' for help."
+#    exit(1)    
 
 ## Get our datetime window
-parse_from,parse_to = datetime_range(options.date)
-if parse_from == None:
-    print "[Error] Missing or malformed -d DATE argument. Try '-h' for help."
-    exit(1)
+#parse_from,parse_to = datetime_range(options.date)
+#if parse_from == None:
+#    print "[Error] Missing or malformed -d DATE argument. Try '-h' for help."
+#    exit(1)
 
 t1 = time.time()
 
@@ -65,18 +65,19 @@ t1 = time.time()
 roster = get_roster(options.roster)
 
 ## Parse the combat log looking for raids
-raids = parse_combat(parse_from, parse_to, options.combatlog, roster, 
-    options.name)
+#raids = parse_combat(parse_from, parse_to, options.combatlog, roster, 
+#    options.name)
+raids = parse_combat(options.combatlog, roster)
 
 ## Parse the chat log looking for loots    
-loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
+#loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
 
 ## Update the raidweeks.xml
-RaidWeeks = RaidWeeksXML()
-RaidWeeks.UpdateRaidWeeks(options, parse_from)
+#RaidWeeks = RaidWeeksXML()
+#RaidWeeks.UpdateRaidWeeks(options, parse_from)
 
 ## Create the summary file
-write_summary(options, parse_from, raids, loots)
+#write_summary(options, parse_from, raids, loots)
 
 
 t2 = time.time()

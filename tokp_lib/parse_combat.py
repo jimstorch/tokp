@@ -10,83 +10,6 @@ import re
 from tokp_lib.timestamp_event import timestamp_event
 from tokp_lib.zones import get_mob_dict
 
-
-#--[ Guess Class ]-------------------------------------------------------------
-
-rogue_spells = ['Anesthetic Poison','Ambush','Feint','Backstab', 
-    'Sinister Strike']
-mage_spells = ['Arcane Blast','Arcane Missiles','Fireball hits','Scorch hits',
-    'Fireblast']
-pet_spells = ['Feed Pet Effect','Feed Pet Effect','Kill Command','Mend Pet']
-
-spell_list = list((spell,'rogue') for spell in rogue_spells)
-spell_list.extend((spell,'mage') for spell in mage_spells)
-spell_list.extend((spell,'pet') for spell in pet_spells)
-
-def guess_class(event):
-
-    """Attempts to determine the class of the current event's subject.
-    Returns None if it cannot tell."""
-
-    guess = None
-    for spell,caster in spell_list:
-        if spell in event:
-            guess = caster
-            break
-    return guess
-
-
-#--[ Find Name ]---------------------------------------------------------------
-
-## Regexes to extract names
-## The notation "[^']+\b" is needed to handle possessive apostrophes that had
-## a space pre-pended by the SW-STATS mod, e.g. "Tom 's heroic strike ...".
-fades_str = r"^.+\sfades\sfrom\s(?P<name>.+)\."
-fades_obj = re.compile(fades_str)               # fades
-gains_str = r"^(?P<name>.+)\s\gains\s"
-gains_obj = re.compile(gains_str)               # gains
-hits_str = r"^(?P<name>.[^']+\b).*\s(?:h|cr)its\s"
-hits_obj = re.compile(hits_str)                 # hits or crits
-suffers_str = r"^(?P<name>.+)\ssuffers\s"
-suffers_obj = re.compile(suffers_str)           # suffers
-heals_str = r"^(?P<name>.[^']+\b).*\sheals\s"
-heals_obj = re.compile(heals_str)               # heals
-afflicted_str = r"^(?P<name>.+)\sis\safflicted\s"
-afflicted_obj = re.compile(afflicted_str)       # afflicts
-
-def find_name(event):
-
-    """Given an event text, attempts to extract a meaningful name."""
-    
-    name = None
-
-    if ' fades from ' in event:
-        match_obj = fades_obj.search(event)
-        if match_obj:
-            name = match_obj.group('name')
-    elif ' gains ' in event:
-        match_obj = gains_obj.search(event)
-        if match_obj:
-            name = match_obj.group('name')        
-    elif 'its ' in event:
-        match_obj = hits_obj.search(event)
-        if match_obj:
-            name = match_obj.group('name')               
-    elif ' suffers ' in event:
-        match_obj = suffers_obj.search(event)
-        if match_obj:    
-            name = match_obj.group('name') 
-    elif ' heals ' in event:
-        match_obj = heals_obj.search(event)
-        if match_obj:
-            name = match_obj.group('name') 
-    elif ' is afflicted ' in event:
-        match_obj = afflicted_obj.search(event)
-        if match_obj:
-            name = match_obj.group('name') 
-    return name
-
-
 #--[ Raid Class ]--------------------------------------------------------------
 
 class Raid(object):
@@ -120,10 +43,12 @@ class Raid(object):
 
 #--[ Parse Combat ]------------------------------------------------------------
 
-def parse_combat(parse_from, parse_to, combat_log, roster, you):
+#def parse_combat(parse_from, parse_to, combat_log, roster):   
+def parse_combat(combat_log, roster):   
 
     log = open(combat_log, 'rU')
     mob_dict = get_mob_dict()
+    #print mob_dict
     raid_list = []
     current_raid = None    
     inc_lines=0
@@ -133,6 +58,26 @@ def parse_combat(parse_from, parse_to, combat_log, roster, you):
     ## Read each line of the combat log
     for line_number, line in enumerate(log):
                
+        ## Use regex to break up the line
+#        date_str = r"(?P<month>(0?[1-9]|1[012]))/(?P<day>(0?[1-9]|[12][0-9]|3[01]))"
+#        date_obj = re.compile(date_str)
+#        match_date = date_obj.search(line)
+#        
+#        time_str = r"(?P<time>([012][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]))"
+#        time_obj = re.compile(time_str)
+#        match_time = time_obj.search(line)
+#        
+        
+#        if match_date:
+#            print match_date.group('month')
+#            print match_date.group('day')
+#        if match_time:
+#            print match_time.group('time')
+#        if match_name:
+#            print match_name.group('name')
+#            print match_name.group('target')
+#            print match_name.group('effect')
+#
         ## Convert into a timestamp and event text      
         timestamp,event = timestamp_event(line)
         if timestamp == None:
@@ -140,47 +85,55 @@ def parse_combat(parse_from, parse_to, combat_log, roster, you):
             continue 
 
         ## Is the timestamp within our target window?
-        if timestamp >= parse_from and timestamp <= parse_to:
+        #if timestamp >= parse_from and timestamp <= parse_to:
+        if 1:
             inc_lines += 1
 
-            ## Now, look for familiar faces...
-            name = find_name(event)          
+            #name_str = r'"(?P<name>[^"]+)",[0-9x,]*,"(?P<target>[^"]+)",[0-9x,]*,"(?P<effect>[^"]+)"'
+            name_str = r'"(?P<name>[^"]+)",[0-9a-zA-Z,]*,"(?P<target>[^"]+)"'
+            name_obj = re.compile(name_str)
+            match_name = name_obj.search(line)
 
-            if name:
+#            ## Now, look for familiar faces...
+#            name = find_name(event)          
+#
+            if match_name:
+                name = match_name.group('name')
+                #target = match_name.group('target')
+                #print name, target
+#                target = match_name.group('target')
+
+                ## or is it a guildie?    
+                if name in roster:
+                    if current_raid:
+                        current_raid.add_member(name)
                 
                 ## Is it a raid zone mob?            
-                if mob_dict.has_key(name):
+                elif mob_dict.has_key(name):
                     zone = mob_dict[name]
 
                     ## start a raid?
                     if current_raid == None:
-                        print "[parse_combat] Raid detected in %s at %s." % (
-                            zone,timestamp.strftime('%H:%M:%S'))
+                        print "[parse_combat] Raid detected in %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
                         current_raid = Raid(zone,timestamp)
                         ## Always add the log's creator
-                        current_raid.add_member(you)
+                        #current_raid.add_member(you)
                         raid_list.append(current_raid)
                         
                     ## have we moved zones?       
                     elif current_raid.zone != zone:
-                        print "[parse_combat] Zone changed to %s at %s." % (
-                            zone,timestamp.strftime('%H:%M:%S'))
+                        print "[parse_combat] Zone changed to %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
                         ## close the first one
                         current_raid.end_time = current_raid.last_pulse
                         ## start a new raid
                         current_raid = Raid(zone,timestamp)
                         # Always add the log's creator
-                        current_raid.add_member(you)
+                        #current_raid.add_member(you)
                         raid_list.append(current_raid)
                         
                     else:
                         ## otherwise, keep raid timer beating
                         current_raid.pulse(timestamp)
-           
-                ## or is it a guildie?    
-                elif name in roster:
-                    if current_raid:
-                        current_raid.add_member(name)
 
             ## Test for raid decay.
             if current_raid:
