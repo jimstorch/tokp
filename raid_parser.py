@@ -77,8 +77,9 @@ raids = parse_combat(options.combatlog, roster)
 #RaidWeeks.UpdateRaidWeeks(options, parse_from)
 
 ## Create the summary file
+loots = []
 #write_summary(options, parse_from, raids, loots)
-
+write_summary(options, raids, loots)
 
 t2 = time.time()
 print "[complete] Process time was %f seconds." % (t2 - t1) 
