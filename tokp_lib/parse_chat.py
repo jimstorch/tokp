@@ -120,6 +120,6 @@ def parse_chat(chat_log, roster, you):
                     current_raid = None
            
     print "[parse_chat] End of scan. Found",len(loot_list),"raid(s)."                   
-    print "[parse_chat] Date matched",inc_lines,"of",line_number+1,"lines." 
+    print "[parse_chat] Date matched",inc_lines,"of",line_number+1,"lines."
     
- return loot_list
+    return loot_list

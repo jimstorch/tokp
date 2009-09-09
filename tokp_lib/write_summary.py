@@ -40,7 +40,7 @@ def write_summary(options, raids, loots):
         output_path = ('data/raids/%s' % raidweekstr)
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
-        filename = ('%s/%s_%s.raid' % (output_path, datestr, raid.zone))
+        filename = ('%s/%s %s.raid' % (output_path, datestr, raid.zone))
         summary = open(filename,'w')
         raid.raid_members.sort()
         for member in raid.raid_members:
