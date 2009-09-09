@@ -19,6 +19,7 @@ from tokp_lib.roster import get_roster
 from tokp_lib.parse_combat import parse_combat
 from tokp_lib.parse_chat import parse_chat
 from tokp_lib.write_summary import write_summary
+from tokp_lib.zones import get_loot_dict
 
 VERSION = '.004 (pre-alpha)'
 
@@ -27,8 +28,8 @@ usage = "usage: %prog [options] -d DATE -n NAME"
 parser = OptionParser(usage=usage)
 parser.add_option('-d','--date', dest='date',
     help="date to parse in the format 'MM/DD'", default='')
-parser.add_option('-n','--name', dest='name', default=None,
-    help="name of the character that created BOTH logs")
+parser.add_option('-n','--name', dest='name', default='Sarkoris',
+    help="name of the character that created the chat log")
 parser.add_option('-b','--battlelog', dest='combatlog', 
     default='logs/WoWCombatLog.txt',
     help="filename of the combat log to parse")
@@ -70,10 +71,9 @@ roster = get_roster(options.roster)
 raids = parse_combat(options.combatlog, roster)
 
 ## Parse the chat log looking for loots    
-#loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
+loots = parse_chat(options.chatlog, roster, options.name)
 
 ## Create the summary file
-loots = []
 #write_summary(options, parse_from, raids, loots)
 write_summary(options, raids, loots)
 

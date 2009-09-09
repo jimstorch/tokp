@@ -50,7 +50,7 @@ if options.version:
 if not options.overwrite and os.path.exists(options.outfile):
     print "[error] '%s' already exist.  Use '-y' to overwrite." \
          % options.outfile
-    sys.exit()    
+    sys.exit()
 
 # read in the contents of the armory
 Guild = ArmoryGuild(options.guildname,options.realm,options.locale)

@@ -21,7 +21,7 @@ def write_summary(options, raids, loots):
         output_path = ('data/raids/%s' % raidweekstr)
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
-        filename = ('%s/%s_%s.txt' % (output_path, datestr, options.name))
+        filename = ('%s/%s %s.txt' % (output_path, datestr, options.name))
         summary = open(filename,'w')    
     
         line = 'Raided %s from %s until %s.\n' % (raid.zone, 
@@ -45,6 +45,20 @@ def write_summary(options, raids, loots):
         raid.raid_members.sort()
         for member in raid.raid_members:
             summary.write(member + ' (0)' + '\n')
+        summary.close()
+
+    for loot in loots:
+        # write loot files with the old formatting
+        datestr = loot.start_time.strftime('%Y-%m-%d')
+        raidweekstr = raidweek_output(options.raidweek_start, loot.start_time)
+        output_path = ('data/raids/%s' % raidweekstr)
+        if not os.path.isdir(output_path):
+            os.mkdir(output_path)
+        filename = ('%s/%s %s.loot' % (output_path, datestr, loot.zone))
+        print filename
+        summary = open(filename,'w')
+        for item in loot.item_list:
+            summary.write(item[0] + ',' + item[1] + ',\n')
         summary.close()
             
 #    summary.write('\n\nLoot received this day:\n\n')
