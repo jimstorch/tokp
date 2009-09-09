@@ -165,6 +165,8 @@ class Guild(object):
         return
 
     def UpdateReports(self):
+        if not os.path.isdir('output'):
+            os.mkdir('output')
         TempDebugReport = ""
         TempLootByPerson = ""
         TempSeniority = ""
@@ -189,7 +191,7 @@ class Guild(object):
         self.DebugReport += ("Last updated: %s\n\n" % (datetime.date.today().strftime('%Y-%m-%d')))
         self.DebugReport += TempDebugReport
 
-        DebugReport = open('debug.txt','w')
+        DebugReport = open('output\debug.txt','w')
         DebugReport.write(self.DebugReport)
         DebugReport.close()
         return
@@ -200,7 +202,7 @@ class Guild(object):
         self.LootByPerson += '------------------------------------------------------------------------------------------\n'
         self.LootByPerson += TempLootByPerson
 
-        LootByPerson = open('lootbyperson.txt','w')
+        LootByPerson = open('output\lootbyperson.txt','w')
         LootByPerson.write(self.LootByPerson)
         LootByPerson.close()
         return
@@ -212,7 +214,7 @@ class Guild(object):
         self.Seniority += "------------------------|----------------------------------------------------------------------\n"
         self.Seniority += TempSeniority
         
-        Seniority = open('seniority.txt','w')
+        Seniority = open('output\seniority.txt','w')
         Seniority.write(self.Seniority)
         Seniority.close()
         return
