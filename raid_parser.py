@@ -12,7 +12,7 @@ import sys
 import os
 from optparse import OptionParser
 
-from tokp_lib.raidweeks_xml import RaidWeeksXML
+#from tokp_lib.raidweeks_xml import RaidWeeksXML
 #from tokp_lib.raidweeks_xml import raidweek_output
 from tokp_lib.datetime_range import datetime_range
 from tokp_lib.roster import get_roster
@@ -36,7 +36,7 @@ parser.add_option('-c','--chatlog', dest='chatlog',
     default='logs/WoWChatLog.txt', help="filename of the chat log to parse")
 parser.add_option('-r','--roster', dest='roster', 
     default='roster/roster.txt', 
-    help="filename of the guild roster(CSV format)")    
+    help="filename of the guild roster")    
 parser.add_option('-v','--version', action="store_true", dest="version", 
     default=False, help="show program version number and exit")
 
@@ -72,14 +72,14 @@ raids = parse_combat(options.combatlog, roster)
 ## Parse the chat log looking for loots    
 #loots = parse_chat(parse_from, parse_to, options.chatlog, roster, options.name)
 
-## Update the raidweeks.xml
-#RaidWeeks = RaidWeeksXML()
-#RaidWeeks.UpdateRaidWeeks(options, parse_from)
-
 ## Create the summary file
 loots = []
 #write_summary(options, parse_from, raids, loots)
 write_summary(options, raids, loots)
+
+## Update the raidweeks.xml
+#RaidWeeks = RaidWeeksXML()
+#RaidWeeks.UpdateRaidWeeks(options, parse_from)
 
 t2 = time.time()
 print "[complete] Process time was %f seconds." % (t2 - t1) 
