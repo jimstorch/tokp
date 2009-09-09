@@ -31,7 +31,8 @@ t1 = time.time()
 # define the guild
 ToK = Guild()
 # load all raids
-ToK.LoadRaids()
+#ToK.LoadRaids()
+ToK.LoadAll()
 t2 = time.time()
 print "[raids loaded] Process time was %1.3f seconds." % (t2 - t1) 
 # compute attendance at every raidweek
