@@ -9,8 +9,14 @@
 import datetime
 from string import capwords, lower
 
+import os
+import glob
+import re
+import datetime
+from tokp_lib.parse_combat import Raid
+from tokp_lib.parse_chat import Loot
 from tokp_lib.xml_store import read_raid_xml, raid_files
-from tokp_lib.raidweeks_xml import RaidWeek, raidweek_output
+from tokp_lib.raidweeks_xml import RaidWeek, RaidWeeksXML, raidweek_output
 import tokp_lib.system_rules as Rules
 
 #--[ Guild Class ]-------------------------------------------------------------
@@ -25,24 +31,107 @@ class Guild(object):
         self.LootByPerson = ""
         self.LootByDate = ""
         self.LootByBoss = ""
+        self.Seniority = ""
         return
 
+    def LoadAll(self):
+        RaidWeeks = RaidWeeksXML()
+        RaidWeeks.LoadRaidWeeks()
+        #print RaidWeeks.RaidWeeks
+        for str_raid_week in RaidWeeks.RaidWeeks:
+            #str_raidweek = raid_week[11:21]
+            #print str_raid_week
+            raidfiles = glob.glob('data/raids/%s/*.raid' % str_raid_week)
+            lootfiles = glob.glob('data/raids/%s/*.loot' % str_raid_week)
+            #print raidfiles
+            #print lootfiles
+            if str_raid_week not in self.RaidWeeks.keys():
+                self.RaidWeeks[str_raid_week] = RaidWeek(str_raid_week)
+            for raidfile in raidfiles:
+                self.RaidWeeks[str_raid_week].add_raid(self.read_raidfile(raidfile))
+            for lootfile in lootfiles:
+                self.RaidWeeks[str_raid_week].add_loot(self.read_lootfile(lootfile))
+            #print self.RaidWeeks[str_raid_week].Raids
+            #print self.RaidWeeks[str_raid_week].Loots
+        return
+
+    def read_raidfile(self, raidfile):
+        ## Regex for raid files
+        fname_str = r'.*[/\\](?P<fname>.+)\.raid'
+        fname_obj = re.compile(fname_str)
+        match_obj = fname_obj.search(raidfile)
+        fname = match_obj.group('fname')
+        ## Slice fname into date and zone
+        start = datetime.datetime(int(fname[0:4]),int(fname[5:7]),int(fname[8:10]),20,0)
+        zone = fname[11:len(fname)]
+        ## Make Raid class
+        raid = Raid(zone,start)
+        ## Regex for raid files
+        membername_str = r'(?P<membername>.+) \((?P<memberlevel>.+)\)'
+        membername_obj = re.compile(membername_str)
+        raidfileID = open(raidfile, 'rU')
+        ## Add everyone from file to raid
+        for line_number, line in enumerate(raidfileID):
+            #print line
+            match_obj = membername_obj.search(line)
+            if match_obj:
+                raid.add_member(match_obj.group('membername'))
+                #print match_obj.group('membername')
+        #print raid.raid_members
+        return raid
+        
+    def read_lootfile(self, lootfile):
+        ## Regex for loot files
+        fname_str = r'.*[/\\](?P<fname>.+)\.loot'
+        fname_obj = re.compile(fname_str)
+        match_obj = fname_obj.search(lootfile)
+        fname = match_obj.group('fname')
+        ## Slice fname into date and zone
+        start = datetime.datetime(int(fname[0:4]),int(fname[5:7]),int(fname[8:10]),20,0)
+        zone = fname[11:len(fname)]
+        ## Make Loot class
+        loot = Loot(zone,start)
+        lootfileID = open(lootfile, 'rU')
+        ## Add every item from file to loot
+        for line_number, line in enumerate(lootfileID):
+            #print line
+            loot.add_item(line)
+        #print loot.item_list
+        return loot
+        
     def LoadRaids(self):
-        file_list = raid_files()
-        for fname in file_list:
-            if not fname == "raidweeks":
-                self.AllRaids[fname] = read_raid_xml(fname+'.xml')
-        self.parse_all_raids()
+#        ## Regex for raid files
+#        fname_str = r'.*[/\\](?P<fname>.+)\.raid'
+#        fname_obj = re.compile(fname_str)
+#        ## Find all raid files
+#        file_list = []
+#        raidfiles = glob.glob('data/raids/*.raid')
+#        for raidfile in raidfiles:
+#            match_obj = fname_obj.search(raidfile)           
+#            fname = match_obj.group('fname')
+#            self.AllRaids[fname] = self.read_raid(fname+'raid')
+##        file_list.sort()
+##        for fname in file_list:
+##            if not fname == "raidweeks":
+##                self.AllRaids[fname] = read_raid_xml(fname+'.xml')
+#        self.parse_all_raids()
         return
-
-    def parse_all_raids(self):
-        # sort all raids and loots into raidweek buckets
-        for index in self.AllRaids.keys():
-            str_raidweek = raidweek_output(Rules.RaidWeekStart, self.AllRaids[index].start_time)
-            if str_raidweek not in self.RaidWeeks.keys():
-               self.RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
-            self.RaidWeeks[str_raidweek].add_member(self.AllRaids[index])
-        return
+#
+#    def read_raid(self,fname):
+#        return
+#
+#    def LoadLoots(self):
+#        self.parse_all_loots()
+#        return
+#
+#    def parse_all_raids(self):
+#        # sort all raids and loots into raidweek buckets
+#        for index in self.AllRaids.keys():
+#            str_raidweek = raidweek_output(Rules.RaidWeekStart, self.AllRaids[index].start_time)
+#            if str_raidweek not in self.RaidWeeks.keys():
+#               self.RaidWeeks[str_raidweek] = RaidWeek(str_raidweek)
+#            self.RaidWeeks[str_raidweek].add_member(self.AllRaids[index])
+#        return
 
     def add_member(self, Member):
         self.MemberList[Member] = GuildMember(Member)
@@ -78,12 +167,23 @@ class Guild(object):
     def UpdateReports(self):
         TempDebugReport = ""
         TempLootByPerson = ""
+        TempSeniority = ""
         for Member in self.MemberList.keys():
             self.MemberList[Member].ScanMemberEvents()
             TempDebugReport += ("%s\n%s\n" % (self.MemberList[Member].Name, self.MemberList[Member].DebugReport))
             TempLootByPerson += ("%s\n" % self.MemberList[Member].LootByPerson)
+            temp = "".join(map(str, self.MemberList[Member].SeniorityVec))
+            temp = temp.rjust(len(self.RaidWeeks.keys()))
+            temp = temp.replace('0',' ')
+            temp = temp.replace('1','-')
+            temp = temp.replace('2','=')
+            temp = temp.replace('3','x')
+            temp = temp.replace('4','@')
+            temp = temp.replace('5','*')
+            TempSeniority += ("%s%5.1f   |%s\n" % (self.MemberList[Member].Name.ljust(16), self.MemberList[Member].Seniority, temp))
         self.update_debug(TempDebugReport)
         self.update_lootbyperson(TempLootByPerson)
+        self.update_seniority(TempSeniority)
 
     def update_debug(self, TempDebugReport):
         self.DebugReport += ("Last updated: %s\n\n" % (datetime.date.today().strftime('%Y-%m-%d')))
@@ -103,6 +203,18 @@ class Guild(object):
         LootByPerson = open('lootbyperson.txt','w')
         LootByPerson.write(self.LootByPerson)
         LootByPerson.close()
+        return
+
+    def update_seniority(self, TempSeniority):
+        self.Seniority += ("Last updated: %s\n\n" % (datetime.date.today().strftime('%Y-%m-%d')))
+        self.Seniority += "Participation 4:'@', 3:'x', 2:'=', 1:'-', 0:' '\n\n"
+        self.Seniority += "Name           Seniority|\n"
+        self.Seniority += "------------------------|----------------------------------------------------------------------\n"
+        self.Seniority += TempSeniority
+        
+        Seniority = open('seniority.txt','w')
+        Seniority.write(self.Seniority)
+        Seniority.close()
         return
 
 #--[ GuildMember Class ]-------------------------------------------------------

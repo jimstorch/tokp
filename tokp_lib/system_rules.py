@@ -17,3 +17,5 @@ ValueCosts = {1:20 , 2:6, 3:3, 4:1}
 MinCost = 20
 MaxCost = 50
 ResetPercent = 0.75
+
+

@@ -17,17 +17,25 @@ class RaidWeek(object):
     def __init__(self, str_raidweek):
         self.NumRaidsThisWeek = 0
         self.Raids = []
+        self.Loots = []
         self.AttendanceDate = datetime.date(2000,1,1)
         self.set_raid_week(str_raidweek)
     
-    def add_member(self, Raid):
+    def add_raid(self, Raid):
         self.Raids.append(Raid)
         self.Raids.sort()
         self.NumRaidsThisWeek += 1
-
-    def del_member(self, Raid):
+    
+    def del_raid(self, Raid):
         self.Raids.remove(Raid)
         self.NumRaidsThisWeek -= 1
+
+    def add_loot(self, Loot):
+        self.Loots.append(Loot)
+        self.Loots.sort()
+
+    def del_loot(self, Loot):
+        self.Loots.remove(Loot)
 
     def set_raid_week(self, str_raidweek):
         """Given a string in the format 'YYYY-MM-DD YYYY-MM-DD',
@@ -138,7 +146,7 @@ class RaidWeeksXML(object):
         # save the updated raidweeks.xml
         self.save_raidweeks()
 
-        return 
+        return
 
     ## Jim's implementation
     def raidweek2(timestamp):

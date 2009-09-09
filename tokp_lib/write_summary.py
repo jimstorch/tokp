@@ -44,7 +44,7 @@ def write_summary(options, raids, loots):
         summary = open(filename,'w')
         raid.raid_members.sort()
         for member in raid.raid_members:
-            summary.write(member + '(0)' + '\n')
+            summary.write(member + ' (0)' + '\n')
         summary.close()
             
 #    summary.write('\n\nLoot received this day:\n\n')

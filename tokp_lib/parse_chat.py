@@ -12,6 +12,21 @@ import re
 from tokp_lib.timestamp_event import timestamp_event
 from tokp_lib.zones import get_loot_dict
 
+#--[ Loot Class ]--------------------------------------------------------------
+class Loot(object):
+
+    def __init__(self, zone, start_time):
+        self.zone = zone
+        self.item_list = []
+        self.start_time = start_time
+
+    def add_item(self, name):
+        if name not in self.item_list:
+            self.item_list.append(name)
+            #print "[%s] Add %s." % (self.zone,name)
+
+#--[ parse chat ]--------------------------------------------------------------
+
 # regex to pull name & item
 loot_str = r"^(?P<name>.+)\sreceive[s]?\sloot:\s(?P<item>.+)\."
 loot_obj = re.compile(loot_str)
