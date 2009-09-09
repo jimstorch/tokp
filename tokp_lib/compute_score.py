@@ -170,7 +170,11 @@ class Guild(object):
         TempDebugReport = ""
         TempLootByPerson = ""
         TempSeniority = ""
-        for Member in self.MemberList.keys():
+        ## Sort the memberlist by name
+        keys = self.MemberList.keys()
+        keys.sort(lambda x,y: cmp(x.lower(),y.lower()))
+        #print keys
+        for Member in keys:
             self.MemberList[Member].ScanMemberEvents()
             TempDebugReport += ("%s\n%s\n" % (self.MemberList[Member].Name, self.MemberList[Member].DebugReport))
             TempLootByPerson += ("%s\n" % self.MemberList[Member].LootByPerson)
@@ -429,5 +433,3 @@ class GuildMember(object):
         return
     
 #------------------------------------------------------------------------------
-
-
