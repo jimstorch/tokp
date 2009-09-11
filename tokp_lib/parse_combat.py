@@ -114,7 +114,8 @@ def parse_combat(combat_log, roster):
 
                     ## start a raid?
                     if current_raid == None:
-                        print "[parse_combat] Raid detected in %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
+                        #print "[parse_combat] Raid detected in %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
+                        print "[parse_combat] Raid detected in %s at %s." % (zone,timestamp.strftime('%Y-%m-%d %H:%M:%S'))
                         current_raid = Raid(zone,timestamp)
                         ## Always add the log's creator
                         #current_raid.add_member(you)
@@ -122,7 +123,9 @@ def parse_combat(combat_log, roster):
                         
                     ## have we moved zones?       
                     elif current_raid.zone != zone:
-                        print "[parse_combat] Zone changed to %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
+                        #print "[parse_combat] Zone changed to %s at %s." % (zone,timestamp.strftime('%H:%M:%S'))
+                        print "[parse_combat] Zone changed to %s at %s." % (zone,timestamp.strftime('%Y-%m-%d %H:%M:%S'))
+                        #print name, zone
                         ## close the first one
                         current_raid.end_time = current_raid.last_pulse
                         ## start a new raid

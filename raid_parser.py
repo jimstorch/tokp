@@ -14,12 +14,11 @@ from optparse import OptionParser
 
 #from tokp_lib.raidweeks_xml import RaidWeeksXML
 #from tokp_lib.raidweeks_xml import raidweek_output
-from tokp_lib.datetime_range import datetime_range
+#from tokp_lib.datetime_range import datetime_range
 from tokp_lib.roster import get_roster
 from tokp_lib.parse_combat import parse_combat
 from tokp_lib.parse_chat import parse_chat
 from tokp_lib.write_summary import write_summary
-from tokp_lib.zones import get_loot_dict
 
 VERSION = '.004 (pre-alpha)'
 
@@ -72,6 +71,7 @@ raids = parse_combat(options.combatlog, roster)
 
 ## Parse the chat log looking for loots    
 loots = parse_chat(options.chatlog, roster, options.name)
+#loots = []
 
 ## Create the summary file
 #write_summary(options, parse_from, raids, loots)

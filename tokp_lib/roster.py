@@ -19,8 +19,8 @@ class ArmoryGuild(object):
         self.strGuild = strGuild
         self.strRealm = strRealm
         self.strLocale = strLocale
-        self.MinRank = 1;
-        self.MaxRank = 8;
+        self.MinRank = 0;
+        self.MaxRank = 9;
         self.MinLevel = 80;
         self.Roster = []
         self.read_armory()
