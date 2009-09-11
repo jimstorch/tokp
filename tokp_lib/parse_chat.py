@@ -103,8 +103,9 @@ def parse_chat(chat_log, roster, you):
                         else:
                             ## otherwise, keep raid timer beating
                             current_raid.pulse(timestamp)                            
-                            
-                        current_raid.add_item( (name,item,timestamp) )
+                        
+                        value = ''
+                        current_raid.add_item( (name,item,value) )
            
            
             ## Test for raid decay.

@@ -37,6 +37,7 @@ t2 = time.time()
 print "[raids loaded] Process time was %1.3f seconds." % (t2 - t1) 
 # compute attendance at every raidweek
 ToK.ComputeAttendance()
+ToK.ComputePointsSpent()
 t2 = time.time()
 print "[scores computed] Process time was %1.3f seconds." % (t2 - t1) 
 # update reports for output

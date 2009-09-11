@@ -18,7 +18,7 @@ class RaidWeek(object):
         self.NumRaidsThisWeek = 0
         self.Raids = []
         self.Loots = []
-        self.AttendanceDate = datetime.date(2000,1,1)
+        self.AttendanceDate = datetime.datetime(2000,1,1,6,0)
         self.set_raid_week(str_raidweek)
     
     def add_raid(self, Raid):
@@ -54,7 +54,7 @@ class RaidWeek(object):
             year2 = int(match_obj.group('year2'))
             month2 = int(match_obj.group('month2'))
             day2 = int(match_obj.group('day2'))
-            self.AttendanceDate = datetime.date(year1, month1, day1)
+            self.AttendanceDate = datetime.datetime(year1, month1, day1,6,0)
             return 
         else:
             raise ValueError('Could not parse datetime string')

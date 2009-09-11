@@ -58,7 +58,7 @@ def write_summary(options, raids, loots):
         print filename
         summary = open(filename,'w')
         for item in loot.item_list:
-            summary.write(item[0] + ',' + item[1] + ',\n')
+            summary.write(item[0] + ',' + item[1] ',' + item[2] + '\n')
         summary.close()
             
 #    summary.write('\n\nLoot received this day:\n\n')
