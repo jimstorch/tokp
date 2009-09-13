@@ -48,6 +48,9 @@ def get_mob_dict():
 lootstr = r'.*[/\\](?P<zone>.+)\.loot'
 loot_obj = re.compile(lootstr)
 
+boss_str = r'\[(?P<boss>.+)\]'
+boss_obj = re.compile(boss_str)
+
 def get_loot_dict():
 
     """Find all *.loot files and build a master list of items we care about."""
@@ -67,6 +70,45 @@ def get_loot_dict():
                 loot_dict[loot] = zone
             else:
                 print '[warning] Duplicate loot item:', loot
+
+    print '[zones] Created list of', len(loot_dict),'epic loot items.'
+    #print loot_dict
+    return loot_dict
+
+## Repeat of above, but include some boss names
+def get_boss_loot_dict():
+
+    """Find all *.loot files and build a master list of items we care about."""
+
+    boss_dict = {}
+    loot_dict = {}
+    #loot_files = glob.glob('zones/*.loot')
+    loot_files = glob.glob("zones/Gruul's Lair.loot")
+    
+    for loot_file in loot_files:
+        print "[zones] Reading loot file '%s'." % loot_file
+        match_obj = loot_obj.search(loot_file)
+        zone = match_obj.group('zone')
+        lootfile = open(loot_file,'rU')
+        
+        cur_boss = ''
+        
+        for line in lootfile:
+            match_obj = boss_obj.search(line)
+            if match_obj:
+                cur_boss = match_obj.group('boss')
+            else:
+                loot = line.strip()
+                if not loot_dict.has_key(loot):        
+                    loot_dict[loot] = zone
+                else:
+                    print '[warning] Duplicate loot item:', loot
+                if not boss_dict.has_key(loot):
+                    boss_dict[loot] = (zone, cur_boss)
+                else:
+                    print '[warning] Duplicate boss:', cur_boss
+
+        print boss_dict
 
     print '[zones] Created list of', len(loot_dict),'epic loot items.'
     #print loot_dict

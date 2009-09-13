@@ -13,6 +13,7 @@ import os
 import re
 from optparse import OptionParser
 
+#from tokp_lib.zones import get_loot_dict
 from tokp_lib.parse_chat import Loot
 from tokp_lib.timestamp_event import timestamp_event
 from tokp_lib.write_summary import write_summary
@@ -30,7 +31,9 @@ old_loot_file = 'old_loot/old_loot_by_date.txt'
 old_loot_file_ID = open(old_loot_file, 'rU')
 
 raid_date = datetime.datetime(2000,1,1,20,0)
-date_str = r'(?P<year>(20[0-9][0-9]))-(?P<month>(0?[1-9]|1[012]))-(?P<day>(0?[1-9]|[12][0-9]|3[01]))'
+raid_zone = ''
+#date_str = r'(?P<year>(20[0-9][0-9]))-(?P<month>(0?[1-9]|1[012]))-(?P<day>(0?[1-9]|[12][0-9]|3[01]))'
+date_str = r'(?P<year>(20[0-9][0-9]))-(?P<month>(0[1-9]|1[012]))-(?P<day>(0[1-9]|[12][0-9]|3[01]))'
 time_str = r'(?P<hour>(0?[0-9]|[12][0-9])):(?P<minute>([0-5][0-9])):(?P<second>([0-5][0-9]))'
 date_obj = re.compile(date_str)
 time_obj = re.compile(time_str)
@@ -39,13 +42,15 @@ time_obj = re.compile(time_str)
 loots = []
 loot = Loot('',raid_date)
 
+#loot_dict = get_loot_dict()
+
 ## Read each line of the combat log
 for line_number, line in enumerate(old_loot_file_ID):
     ## Split the line on the commas, order as follows
     ## date and time, zone, boss, item, member, value
     ## one hitch, the value field is opposite from the rest of this python code
     timestamp, zone, boss, item, name, value = line.strip().split(',')
-    #print timestamp, zone, boss, item, member, value
+    #print zone, boss, item, name, value
     
     ## Convert the timestamp string to an actual timestamp
     date_match_obj = date_obj.search(timestamp)
@@ -77,17 +82,24 @@ for line_number, line in enumerate(old_loot_file_ID):
         value = 5
     value = Rules.RevValueLabels[value]
 
-    if (timestamp == raid_date):
+    ## Fix the zone
+    #if loot_dict.has_key(item):
+    #    zone = loot_dict[item]
+    #else:
+    #    print '[loot_mdb_parser] Unknown loot item:', item
+    
+    if (timestamp == raid_date) and (zone == raid_zone):
         # same raid, append the item
-        loot.add_item( (name,item,value) )
+        loot.add_item( (boss,item,name,value) )
     else:
         if (loot.item_list != []):
             loots.append(loot)
             #print loot.item_list
         # make a new raid
         loot = Loot(zone,timestamp)
-        loot.add_item( (name,item,value) )
+        loot.add_item( (boss,item,name,value) )
         raid_date = timestamp
+        raid_zone = zone
 
     loots.append(loot)
 

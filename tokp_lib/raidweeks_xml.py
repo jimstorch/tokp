@@ -54,7 +54,7 @@ class RaidWeek(object):
             year2 = int(match_obj.group('year2'))
             month2 = int(match_obj.group('month2'))
             day2 = int(match_obj.group('day2'))
-            self.AttendanceDate = datetime.datetime(year1, month1, day1,6,0)
+            self.AttendanceDate = datetime.datetime(year2, month2, day2,6,0)
             return 
         else:
             raise ValueError('Could not parse datetime string')
@@ -168,12 +168,14 @@ def raidweek_output(raidweek_start, raid_date):
     week_end = datetime.date
 
     # pull out dates of start and end of the week
-    if raid_day <= raidweek_start:
+    if raid_day < raidweek_start:
         temp1 = datetime.timedelta(raidweek_start-raid_day-7)
         temp2 = datetime.timedelta(raidweek_start-raid_day)
         week_start = raid_date + temp1
         week_end = raid_date + temp2
     else:
+        ## Assume that events happening on the raidweek start day are happening
+        ## in the evening and part of the following week
         temp1 = datetime.timedelta(raidweek_start-raid_day)
         temp2 = datetime.timedelta(raidweek_start-raid_day+7)
         week_start = raid_date + temp1

@@ -42,7 +42,7 @@ class Guild(object):
         for str_raid_week in RaidWeeks.RaidWeeks:
             #print str_raid_week
             raidfiles = glob.glob('data/raids/%s/*.raid' % str_raid_week)
-            lootfiles = glob.glob('data/raids/%s/*.loot' % str_raid_week)
+            lootfiles = glob.glob('data/loots/%s/*.loot' % str_raid_week)
             #print raidfiles
             #print lootfiles
             if str_raid_week not in self.RaidWeeks.keys():
@@ -97,14 +97,17 @@ class Guild(object):
             if line == '':
                 continue
             #print line
-            member, item, value = line.strip().split(',')
+            boss, item, name, value = line.strip().split(',')
+            #print boss, item, name, value
             if value == '':
                 value = 'special'
-            loot.add_item( (member,item,value) )
+            loot.add_item( (boss,item,name,value) )
         #print loot.item_list
         return loot
         
     def add_member(self, Member):
+#        if Member == 'Vosslr':
+#            print 'adding Vosslr'
         self.MemberList[Member] = GuildMember(Member)
         return
 
@@ -115,14 +118,25 @@ class Guild(object):
     def ComputeAttendance(self):
         # compute participation in each week
         Attendance = []
-        for Week in self.RaidWeeks.keys():
+        
+        sorted_raid_weeks = self.RaidWeeks.keys()
+        sorted_raid_weeks.sort(cmp=sort_raid_weeks)
+        #print sorted_raid_weeks
+                
+        for Week in sorted_raid_weeks:
             WeekAttendance = {}
             for CurRaid in self.RaidWeeks[Week].Raids:
                 for Member in CurRaid.raid_members:
                     if Member not in self.MemberList.keys():
+#                        if Member == 'Vosslr':
+#                            print 'vosslr in raid but not in keys'
                         self.add_member(Member)
                     if Member not in WeekAttendance.keys():
+#                        if Member == 'Vosslr':
+#                            print 'vosslr in raid but not in week'
                         WeekAttendance[Member] = 0
+#                    if Member == 'Vosslr':
+#                        print 'vosslr in raid %s' % CurRaid.zone
                     WeekAttendance[Member] += float(1) / float(self.RaidWeeks[Week].NumRaidsThisWeek)
             # store the weekly participation event for each member
             for Member in self.MemberList.keys():
@@ -138,15 +152,20 @@ class Guild(object):
              for CurLoot in self.RaidWeeks[Week].Loots:
                  for Item in CurLoot.item_list:
                      #print Item
-                     member = Item[0]
                      date = CurLoot.start_time
                      zone = CurLoot.zone
-                     item_name = Item[1]
-                     value = Item[2]
-                     #print member, date, zone, item_name, value
-                     if member not in self.MemberList.keys():
-                         self.add_member(member)
-                     self.MemberList[member].add_loot(date, zone, item_name, value)
+                     boss = Item[0]
+                     item = Item[1]
+                     Member = Item[2]
+                     value = Item[3]
+                     #print zone, boss, item, member, value
+#                     if Member == 'Vosslr':
+#                         print 'vosslr in loot'
+                     if Member not in self.MemberList.keys():
+#                         if Member == 'Vosslr':
+#                             print 'vosslr in loot but not in keys'
+                         self.add_member(Member)
+                     self.MemberList[Member].add_loot(date, zone, boss, item, value)
         return
 
     def UpdateReports(self):
@@ -161,6 +180,8 @@ class Guild(object):
         keys.sort(lambda x,y: cmp(x.lower(),y.lower()))
         #print keys
         for Member in keys:
+#            if Member == 'Vosslr':
+#                print self.MemberList[Member].MemberEvents
             self.MemberList[Member].ScanMemberEvents()
             TempDebugReport += ("%s\n%s\n" % (self.MemberList[Member].Name, self.MemberList[Member].DebugReport))
 #            TempScoresReport += ("%d
@@ -250,8 +271,10 @@ class GuildMember(object):
         self.SeniorityLastMonth = 0;
         self.DebugReport = ""
         self.LootByPerson = ""
-        NewEvent = [Rules.SystemStartDate, 'Add Member', '', '', '', self.Scores, {}]
+        NewEvent = [Rules.SystemStartDate, 'Add Member', '', '', '', '', self.Scores, {}]
         self.add_event(NewEvent)
+#        if self.Name == 'Vosslr':
+#            print 'Vosslr initialized', self.Scores, self.MemberEvents
         return
 
     def add_participation(self, attendance_date, attendance):
@@ -261,18 +284,33 @@ class GuildMember(object):
                 new_factor = factor
             else:
                 break
-        NewEvent = [attendance_date, 'participation', new_factor, '', '', {}, {}]
-        self.add_event(NewEvent)
+        if Rules.SkipRepeatParticipation:
+            #print self.CurParticipation, new_factor
+            if (self.CurParticipation != new_factor):
+                #print 'new factor'
+                #if self.Name == 'Sarkoris':
+                #    print self.CurParticipation, new_factor
+                NewEvent = [attendance_date, 'participation', new_factor, '', '', '', {}, {}]
+                self.add_event(NewEvent)
+                self.CurParticipation = new_factor
+                #if self.Name == 'Sarkoris':
+                #    print self.MemberEvents
+            #else:
+                #print 'repeat factor'
+        else:
+            NewEvent = [attendance_date, 'participation', new_factor, '', '', '', {}, {}]
+            self.add_event(NewEvent)
         return
 
-    def add_loot(self, date, zone, item, value):
+    def add_loot(self, date, zone, boss, item, value):
         #print LootValue
         if lower(value) not in Rules.ValueLabels.keys():
             print '[compute_score] Invalid loot value, assuming special.'
+            #print zone 
             value = 'special'
         LootValueIndex = Rules.ValueLabels[lower(value)]
         #print LootValueIndex
-        NewEvent = [date, 'loot', LootValueIndex, zone, item, {}, {}]
+        NewEvent = [date, 'loot', LootValueIndex, zone, boss, item, {}, {}]
         self.add_event(NewEvent)
         return
 
@@ -286,17 +324,10 @@ class GuildMember(object):
         return
 
     def get_days_elapsed(self, index, Event):
-        # get the days elapsed between the current event and the previous
-##        if index < len(self.MemberEvents)-1:
-##            NextEvent = self.MemberEvents[index+1]
-##        else:
-##            NextEvent = (datetime.date.today(), "Today")
-##        Delta = NextEvent[0] - Event[0]
         if index == 0:
             PrevEvent = self.MemberEvents[0]
         else:
             PrevEvent = self.MemberEvents[index-1]
-        #print Event[0], PrevEvent[0]
         Delta = Event[0] - PrevEvent[0]
         return Delta.days
 
@@ -305,15 +336,19 @@ class GuildMember(object):
         return
 
     def ScanMemberEvents(self):
+        self.CurParticipation = 0
         self.WeeksAtZero = 0;
         NewScores = {}
+
+        #if self.Name == 'Sarkoris':
+        #    print self.MemberEvents
 
         #print self.Name
 
         # loop through member events
         for index, Event in enumerate(self.MemberEvents):
 
-            #if self.Name == 'Sarkoris':
+            #if (self.Name == 'Sarkoris'):
             #    print Event
 
             # find the days until next event
@@ -323,36 +358,43 @@ class GuildMember(object):
             # "add member" event
             if lower(Event[1]) == "add member":
                 NewScores = {1:0, 2:0, 3:0, 4:0}
-                Event[6] = NewScores
+                Event[7] = NewScores
             # "participation" event
             elif lower(Event[1]) == "participation":
-                #if self.Name == 'Sarkoris':
-                #    print self.Scores, DaysElapsed, self.CurParticipation
                 OldScores = self.add_points(self.CurParticipation, DaysElapsed)
                 NewScores = OldScores
                 #if self.Name == 'Sarkoris':
                 #    print OldScores, self.Scores
+                #if self.Name == 'Sarkoris':
+                #    print self.CurParticipation, Event[2]
                 self.SeniorityVec.append(Event[2])
                 self.CurParticipation = Event[2]
                 if Event[2] == 0:
                     self.WeeksAtZero = self.WeeksAtZero + 1
                 else:
                     self.WeeksAtZero = 0
-                Event[5] = OldScores
-                Event[6] = NewScores
+                Event[6] = OldScores
+                Event[7] = NewScores
+#                if self.Name == 'Vosslr':
+#                    print OldScores, NewScores
             # "loot" event
             elif lower(Event[1]) == "loot":
                 OldScores = self.add_points(self.CurParticipation, DaysElapsed)
                 NewScores = self.subtract_loot(Event[2])
-                Event[5] = OldScores
-                Event[6] = NewScores                
+                Event[6] = OldScores
+                Event[7] = NewScores                
             # "bonus" event
             elif lower(Event[1]) == "bonus":
                 OldScores = self.add_points(self.CurParticipation, DaysElapsed)
                 NewScores = self.bonus_points(Event[2])
-                Event[5] = OldScores
-                Event[6] = NewScores 
-                
+                Event[6] = OldScores
+                Event[7] = NewScores 
+            
+            #if (len(NewScores.keys()) < 4):
+            #    print self.Name
+            #    print Event
+            #    print NewScores
+
             #self.IncScores.append(NewScores)
             self.Scores = NewScores
         # update seniority
@@ -371,18 +413,22 @@ class GuildMember(object):
     
             # find points lost based on weeks inactive
             PointDelta = -Rules.PointDecay[self.WeeksAtZero] / 7.0 * DaysElapsed
+#            if self.Name == 'Vosslr':
+#                print PointDelta
             
             # make sure we don't decay past zero
             for index in self.Scores.keys():
                 if self.Scores[index] > 0 and self.Scores[index] + PointDelta > 0:
                     NewScores[index] = self.Scores[index] + PointDelta
-                elif self.Scores[index] > 0 and self.Scores[index] + PointDelta < 0:
+                elif self.Scores[index] > 0 and self.Scores[index] + PointDelta <= 0:
                     NewScores[index] = 0
                 elif self.Scores[index] <= 0:
                     NewScores[index] = self.Scores[index]
-        else:        
+        else:
             # determine points to add
             PointDelta = Rules.PointsPerDay[Participation] * DaysElapsed
+#            if self.Name == 'Vosslr':
+#                print PointDelta
 
             # make sure we don't exceed max value
             for index in self.Scores.keys():
@@ -411,34 +457,37 @@ class GuildMember(object):
     def update_debug(self):
         self.DebugReport = ""
         for index, Event in enumerate(self.MemberEvents):
-#            if index > 0:
-#                OldScores = self.IncScores[index-1]
-#            else:
-#                OldScores = {1:0, 2:0, 3:0, 4:0}
-#            if index < len(self.MemberEvents):
-#                NewScores = self.IncScores[index]
-#            else:
-#                NewScores = self.Scores
+            event_date = Event[0]
+            event_date_str = event_date.strftime('%Y-%m-%d')
+            event_type = lower(Event[1])
+            zone = Event[3]
+            boss = Event[4]
+            item = Event[5]
+            old_scores = Event[6]
+            new_scores = Event[7]
             DaysElapsed = self.IncDaysElapsed[index]
         
             #print Event[0]
         
             NewDebugLine = ""
-            NewDebugLine += ("[%s] [%3d] " % (Event[0].strftime('%Y-%m-%d'), DaysElapsed))
-            NewDebugLine += ("[%3.0f %3.0f %3.0f] " % (Event[5][1], Event[5][2], Event[5][3]))
-            if lower(Event[1]) == "add member":
-                NewDebugLine += ("%-40s %-30s [%-8s] " % (Event[1].capitalize(), '', ''))
-            elif lower(Event[1]) == "participation":
-                NewDebugLine += ("%-40s %-30s [%-8d] " % (Event[1].capitalize(), '', Event[2]))
-            elif lower(Event[1]) == "loot":
-                NewDebugLine += ("%-40s %-30s [%-8s] " % (Event[4], Event[3], Rules.RevValueLabels[Event[2]].capitalize()))
-            elif lower(Event[1]) == "bonus":
-                NewDebugLine += ("%-40s %-30s [%-8d] " % (Event[3], '', Event[2]))
-            NewDebugLine += ("[%3.0f %3.0f %3.0f]\n" % (Event[6][1], Event[6][2], Event[6][3]))
+            NewDebugLine += ("[%s] [%3d] " % (event_date_str, DaysElapsed))
+            NewDebugLine += ("[%3.0f %3.0f %3.0f] " % (old_scores[1], old_scores[2], old_scores[3]))
+            if (event_type == "add member"):
+                NewDebugLine += ("%-40s %-30s [%-8s] " % (event_type.capitalize(), '', ''))
+            elif (event_type == "participation"):
+                part_mod = Event[2]
+                NewDebugLine += ("%-40s %-30s [%-8d] " % (event_type.capitalize(), '', part_mod))
+            elif (event_type == "loot"):
+                value = Rules.RevValueLabels[Event[2]].capitalize()
+                NewDebugLine += ("%-40s %-30s [%-8s] " % (item, zone, value))
+            elif (event_type == "bonus"):
+                bonus_mod = Event[2]
+                NewDebugLine += ("%-40s %-30s [%-8d] " % (zone, '', bonus_mod))
+            NewDebugLine += ("[%3.0f %3.0f %3.0f]\n" % (new_scores[1], new_scores[2], new_scores[3]))
             self.DebugReport += NewDebugLine
         
         # get the days elapsed between the last event and the current day
-        Delta = datetime.datetime.today() - Event[0]
+        Delta = datetime.datetime.today() - event_date
         DaysElapsed = Delta.days
         #print DaysElapsed
         NewScores = self.add_points(self.CurParticipation, DaysElapsed)
@@ -467,3 +516,34 @@ class GuildMember(object):
         return
     
 #------------------------------------------------------------------------------
+
+def sort_raid_weeks(one, two):
+#    date_str = r'(?P<year1>(20[0-9][0-9]))-(?P<month1>(0?[1-9]|1[012]))-\
+#                 (?P<day1>(0?[1-9]|[12][0-9]|3[01])) \
+#                 (?P<year2>(20[0-9][0-9]))-(?P<month2>(0?[1-9]|1[012]))-\
+#                 (?P<day2>(0?[1-9]|[12][0-9]|3[01]))'
+    date_str = r'(?P<year>\d\d\d\d)-(?P<month>\d\d)-(?P<day>\d\d)'
+#    date_str = r'(?P<year>(20[0-9][0-9]))-(?P<month>(0?[1-9]|1[012]))-(?P<day>(0?[1-9]|[12][0-9]|3[01]))'
+    date_obj = re.compile(date_str)
+    #print date_str
+    #print one, two
+    one_match_obj = date_obj.search(one)
+    two_match_obj = date_obj.search(two)
+    if one_match_obj and two_match_obj:
+        date_one = datetime.date(int(one_match_obj.group('year')),\
+                                 int(one_match_obj.group('month')),\
+                                 int(one_match_obj.group('day')))
+        date_two = datetime.date(int(two_match_obj.group('year')),\
+                                 int(two_match_obj.group('month')),\
+                                 int(two_match_obj.group('day')))
+        #print date_one, date_two
+        if (date_one < date_two):
+            cmp = -1
+        elif (date_one == date_two):
+            cmp = 0
+        elif (date_one > date_two):
+            cmp = 1
+    else:
+        print '[compute_score] error with raid week sorting'
+        cmp = 0
+    return cmp

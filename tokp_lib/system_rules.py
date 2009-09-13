@@ -22,7 +22,7 @@ MaxCost = 50
 ResetPercent = 0.75
 MinPoints = -50
 MaxPoints = 150
-
+SkipRepeatParticipation = 1
 
 def subtract_loot(OldScores, LootValueIndex):
     # reset equal and less valuable scores

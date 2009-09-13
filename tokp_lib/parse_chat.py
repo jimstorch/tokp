@@ -105,7 +105,8 @@ def parse_chat(chat_log, roster, you):
                             current_raid.pulse(timestamp)                            
                         
                         value = ''
-                        current_raid.add_item( (name,item,value) )
+                        boss = ''
+                        current_raid.add_item( (boss,item,name,value) )
            
            
             ## Test for raid decay.
