@@ -10,7 +10,7 @@ import datetime
 import re
 
 from tokp_lib.timestamp_event import timestamp_event
-from tokp_lib.zones import get_loot_dict
+from tokp_lib.zones import get_boss_loot_dict
 
 #--[ Loot Class ]--------------------------------------------------------------
 class Loot(object):
@@ -51,7 +51,7 @@ loot_obj = re.compile(loot_str)
 def parse_chat(chat_log, roster, you):
 
     log = open(chat_log, 'rU')
-    loot_dict = get_loot_dict()
+    loot_dict, boss_dict = get_boss_loot_dict()
     loot_list = []
     current_raid = None
     inc_lines=0
@@ -82,8 +82,8 @@ def parse_chat(chat_log, roster, you):
                     if name == 'You':
                         name = you
 
-                    if loot_dict.has_key(item) and name in roster:
-                        zone = loot_dict[item]
+                    if boss_dict.has_key(item) and name in roster:
+                        zone, boss = loot_dict[item]
                         #print "[%s] %s looted '%s' at %s." % (
                         #    zone, name, item, timestamp.strftime('%H:%M:%S'))
                         #loot_list.append( (zone,name,item,timestamp) )
@@ -105,7 +105,6 @@ def parse_chat(chat_log, roster, you):
                             current_raid.pulse(timestamp)                            
                         
                         value = ''
-                        boss = ''
                         current_raid.add_item( (boss,item,name,value) )
            
            

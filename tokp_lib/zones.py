@@ -82,8 +82,7 @@ def get_boss_loot_dict():
 
     boss_dict = {}
     loot_dict = {}
-    #loot_files = glob.glob('zones/*.loot')
-    loot_files = glob.glob("zones/Gruul's Lair.loot")
+    loot_files = glob.glob('zones/*.loot')
     
     for loot_file in loot_files:
         print "[zones] Reading loot file '%s'." % loot_file
@@ -99,6 +98,8 @@ def get_boss_loot_dict():
                 cur_boss = match_obj.group('boss')
             else:
                 loot = line.strip()
+                #if cur_boss == 'Ignis the Furnace Master':
+                #    print loot
                 if not loot_dict.has_key(loot):        
                     loot_dict[loot] = zone
                 else:
@@ -108,9 +109,7 @@ def get_boss_loot_dict():
                 else:
                     print '[warning] Duplicate boss:', cur_boss
 
-        print boss_dict
-
     print '[zones] Created list of', len(loot_dict),'epic loot items.'
     #print loot_dict
-    return loot_dict
+    return loot_dict, boss_dict
     
