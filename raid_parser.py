@@ -75,7 +75,7 @@ loots = parse_chat(options.chatlog, roster, options.name)
 
 ## Create the summary file
 #write_summary(options, parse_from, raids, loots)
-write_summary(options, raids, loots)
+write_summary(raids, loots, options.raidweek_start)
 
 ## Update the raidweeks.xml
 #RaidWeeks = RaidWeeksXML()

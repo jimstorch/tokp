@@ -7,14 +7,21 @@
 #------------------------------------------------------------------------------
 
 from Tkinter import *
+import tkSimpleDialog
+import tkFileDialog
 import time
 import sys
 
-import tkSimpleDialog
+#from gui_lib.tkSimpleDialog import Dialog as tkSimpleDialog
+from gui_lib.tkSimpleStatusBar import StatusBar as tkSimpleStatusBar
 from tokp_lib.member_name_change import member_name_change
 from tokp_lib.compute_score import Guild
 from tokp_lib.roster import ArmoryGuild
 from tokp_lib.roster import write_roster_text
+from tokp_lib.roster import get_roster
+from tokp_lib.parse_combat import parse_combat
+from tokp_lib.parse_chat import parse_chat
+from tokp_lib.write_summary import write_summary
 
 base_path = 'data/raids/'
 
@@ -28,7 +35,7 @@ class App:
         master.title("ToKP")
 
         # status bar
-        self.status = StatusBar(master)
+        self.status = tkSimpleStatusBar(master)
         self.status.pack(side=BOTTOM, fill=X)
 
         # start the menu system
@@ -46,26 +53,33 @@ class App:
         self.button_update_scores = \
              Button(frame, text="Update Loot Scores", fg="black", \
              command=self.callback_update_scores)
-        self.button_update_scores.grid(row=0, columnspan=2, sticky=E+W, \
+        self.button_update_scores.grid(row=0, rowspan=2, columnspan=2, sticky=E+W, \
+             padx=5, pady=5)
+
+        self.button_parse_combat = \
+             Button(frame, text="Parse Combat Log", fg="black", \
+             command=self.callback_parse_combat)
+        self.button_parse_combat.grid(row=2, columnspan=2, sticky=E+W, \
+             padx=5, pady=5)
+
+        self.button_parse_chat = \
+             Button(frame, text="Parse Chat Log", fg="black", \
+             command=self.callback_parse_chat)
+        self.button_parse_chat.grid(row=3, columnspan=2, sticky=E+W, \
              padx=5, pady=5)
         
         self.button_update_roster = \
              Button(frame, text="Update Roster from Armory", fg="black", \
              command=self.callback_update_roster)
-        self.button_update_roster.grid(row=1, columnspan=2, sticky=E+W, \
+        self.button_update_roster.grid(row=4, columnspan=2, sticky=E+W, \
              padx=5, pady=5)
         
         self.button_name_change = \
              Button(frame, text="Name Change", fg="black", \
              command=self.callback_name_change)
-        self.button_name_change.grid(row=2, columnspan=2, sticky=E+W, \
+        self.button_name_change.grid(row=5, columnspan=2, sticky=E+W, \
              padx=5, pady=5)
-
-
-    def say_hi(self):
-        print "hi there, everyone!"
-        return
-      
+     
     def callback_help_about(self):
         #print "This is TOKP"
         w = AboutDialog(root,"About ToKP")
@@ -105,6 +119,45 @@ class App:
         self.status.set("")
         return
 
+    def callback_parse_combat(self):
+        self.status.set("Finding Combat Log")
+        base_log_dir = 'logs/'
+        w = tkFileDialog.askopenfilename(title='Open Combat Log', \
+            defaultextension='.txt', \
+            initialdir=base_log_dir)
+        #print w
+        if len(w) != 0:
+            self.status.set("Parsing Combat Log")
+            raidweek_start = 2
+            roster_file = 'roster/roster.txt'
+            roster = get_roster(roster_file)
+            raids = parse_combat(w, roster)
+            loots = []
+            print raids
+            #write_summary(raids, loots, raidweek_start)
+        self.status.set("")
+        return
+        
+    def callback_parse_chat(self):
+        self.status.set("Finding Chat Log")
+        base_log_dir = 'logs/'
+        w = tkFileDialog.askopenfilename(title='Open Chat Log', \
+            defaultextension='.txt', \
+            initialdir=base_log_dir)
+        #print w
+        if len(w) != 0:
+            self.status.set("Parsing Chat Log")
+            name = 'Sarkoris'
+            raidweek_start = 2
+            roster_file = 'roster/roster.txt'
+            roster = get_roster(roster_file)
+            raids = []
+            loots = parse_chat(w, roster, name)
+            print loots
+            #write_summary(raids, loots, raidweek_start)
+        self.status.set("")
+        return
+
     def callback_update_roster(self):
         self.status.set("Updating Roster")
         w = ArmoryRosterDialog(root,"Guild Armory Info")
@@ -122,25 +175,10 @@ class App:
         return
 
     def callback_name_change(self):
-        self.status.set("Performing Member Name Change")
+        self.status.set("Changing Member Name")
         w = NameChangeDialog(root,"Member Name Change")
         self.status.set("")
         return
-
-class StatusBar(Frame):
-
-    def __init__(self, master):
-        Frame.__init__(self, master)
-        self.label = Label(self, bd=1, relief=SUNKEN, anchor=W)
-        self.label.pack(fill=X)
-
-    def set(self, format, *args):
-        self.label.config(text=format % args)
-        self.label.update_idletasks()
-
-    def clear(self):
-        self.label.config(text="")
-        self.label.update_idletasks()
 
 class AboutDialog(tkSimpleDialog.Dialog):
     def body(self, master):

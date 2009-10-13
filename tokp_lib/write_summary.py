@@ -12,12 +12,12 @@ import datetime
 from raidweeks_xml import raidweek_output
 
 #def write_summary(options, raid_date, raids, loots):
-def write_summary(options, raids, loots):
+def write_summary(raids, loots, raidweek_start):
 
     for raid in raids:
 #        # make the file name
 #        datestr = raid.start_time.strftime('%Y-%m-%d')
-#        raidweekstr = raidweek_output(options.raidweek_start, raid.start_time)
+#        raidweekstr = raidweek_output(raidweek_start, raid.start_time)
 #        output_path = ('data/raids/%s' % raidweekstr)
 #        if not os.path.isdir(output_path):
 #            os.mkdir(output_path)
@@ -36,7 +36,7 @@ def write_summary(options, raids, loots):
         
         # do it again with the old formatting
         datestr = raid.start_time.strftime('%Y-%m-%d')
-        raidweekstr = raidweek_output(options.raidweek_start, raid.start_time)
+        raidweekstr = raidweek_output(raidweek_start, raid.start_time)
         output_path = ('data/raids/%s' % raidweekstr)
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
@@ -50,7 +50,7 @@ def write_summary(options, raids, loots):
     for loot in loots:
         # write loot files with the old formatting
         datestr = loot.start_time.strftime('%Y-%m-%d')
-        raidweekstr = raidweek_output(options.raidweek_start, loot.start_time)
+        raidweekstr = raidweek_output(raidweek_start, loot.start_time)
         output_path = ('data/loots/%s' % raidweekstr)
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
